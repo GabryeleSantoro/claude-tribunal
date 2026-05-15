@@ -64,7 +64,7 @@ Whenever you change `SKILL.md`, agents, or `plugin.json`:
 /tribunal:deliberate --multi-agent --brief Pick a logging library for a small CLI
 ```
 
-The reply defaults to **compact** (verdict + votes + reasoning). Use **`--full-log`** for the complete write-up in the message. Claude Code may still list subagent tasks in the terminal.
+After a successful run, open **`docs/tribunal/*.md`** for the full verdict; the chat reply is only a short confirmation with the path. Use **`--full-log`** for the long deliberation in that file.
 
 If `--multi-agent` cannot delegate, the skill should still complete with its documented fallback.
 

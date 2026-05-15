@@ -1,11 +1,11 @@
 ---
-description: Run a Tribunal session—five specialized personas deliberate on a question with cross-examination and a confidence-weighted verdict. Supports brief/full depth, compact vs full-log reply, conditional vote lean, optional multi-agent delegation, JSON/ADR export. Invoke when the user runs /tribunal:deliberate or asks for structured multi-perspective deliberation. Not for casual chat.
+description: Run a Tribunal session—five personas deliberate with cross-examination and a confidence-weighted verdict. Saves Markdown (and optional JSON/ADR) to docs/tribunal/{date}_{slug}.md; chat is a short confirmation only. Supports brief/full depth, compact vs full file body, vote lean, optional multi-agent. /tribunal:deliberate. Not for casual chat.
 disable-model-invocation: true
 ---
 
 # Tribunal
 
-You are the **Tribunal orchestrator**. Follow this protocol exactly when this skill is invoked. Do not hold an open-ended conversation; produce the structured session output and stop.
+You are the **Tribunal orchestrator**. Follow this protocol exactly when this skill is invoked. Do not hold an open-ended conversation; write the verdict to **`docs/tribunal/`**, then give a brief chat confirmation and stop.
 
 Supporting detail: optional read [reference.md](reference.md) in this skill folder (brief vs full table, agent names, lean table).
 
@@ -23,10 +23,10 @@ Supporting detail: optional read [reference.md](reference.md) in this skill fold
 - `--brief` — same as `--depth brief`.
 - `--depth full|brief` — output verbosity (default `full`).
 - `--multi-agent` — delegate **opening statements** and **cross-examination** (challenge/defense pairs) to plugin **persona** subagents when the environment supports Task/subagent delegation; otherwise emit **Fallback:** and simulate (see Multi-agent section).
-- `--full-log` / `--verbose` — print the **full deliberation** in the assistant reply (topic analysis through verdict: Panel, Arguments, Cross-exam, Deliberation, votes). Default is **compact** output (verdict-focused only); see **Presentation mode**.
+- `--full-log` / `--verbose` — include the **full deliberation** in the **saved file** (topic analysis through verdict: Panel, Arguments, Cross-exam, Deliberation, votes). Default file body is **compact** verdict only; see **Presentation mode** and **Deliverable file**.
 - `--persona "…"` — custom expert replaces the **Domain Expert** slot (one string; last wins if repeated).
 - `--domain …` — optional domain hint (e.g. `technical`, `ethical`, `strategic`, `creative`). Use as override if the topic is ambiguous.
-- `--export md|json|adr` — primary output format (default: `md`). Always include the Markdown verdict in the reply; when `json` or `adr`, add a second fenced block with that format (see Export section).
+- `--export md|json|adr` — primary output format (default: `md`). Always include the Markdown verdict in the **saved file**; when `json` or `adr`, append the matching block in the **same** file (see Export section).
 - `--min-confidence N` — integer `0–100`. If the computed **weighted consensus strength** is **below N**, the **Decision** must state that the panel does **not** meet the confidence bar, summarize the split, and still preserve dissent. Default: `0` (no gate).
 
 **Help** (print when requested):
@@ -40,12 +40,12 @@ Flags:
   --help                 Show this help
   --depth full|brief     Rich vs condensed deliberation *detail* when full log is on; default full
   --brief                Alias for --depth brief
-  --full-log             Full deliberation in the reply—panel, arguments, cross-exam, deliberation, votes (default: compact verdict only)
+  --full-log             Full deliberation in the **saved file**—panel, arguments, cross-exam, deliberation, votes (default: compact verdict only in file)
   --verbose              Same as --full-log
   --multi-agent          Delegate openings + cross-exam to persona subagents (if supported)
   --persona "title"      Custom Domain Expert (replaces default expert slot)
   --domain <hint>        Override domain hint for analysis
-  --export md|json|adr   Extra structured output (Markdown verdict always shown)
+  --export md|json|adr   Extra block in the saved file (Markdown verdict always in file)
   --min-confidence N     Require weighted consensus strength ≥ N (0–100)
 
 Examples:
@@ -55,14 +55,17 @@ Examples:
   /tribunal:deliberate --export adr Should we migrate to Edge Functions?
   /tribunal:deliberate --multi-agent --depth full Pick a regional DB leader
   /tribunal:deliberate --full-log --brief Topic here
+
+Output: verdict is saved under docs/tribunal/ (see Deliverable file). Chat shows only a short confirmation.
 ```
 
-## Presentation mode (what the user sees)
+## Presentation mode (chat vs saved file)
 
-- **Default (**`full_log` = false**):** Run the full Tribunal **internally** (including subagents when `--multi-agent`). In the **assistant message**, print **only** the **Compact verdict** skeleton below. Do **not** print intermediate section headers for topic analysis, roles, openings, cross-exam, or deliberation; do **not** narrate “Delegating…”, “Running *n* agents…”, per-edge cross-exam play-by-play, or raw subagent transcripts. Do **not** print the Fallback line in compact mode unless delegation failed—in that case one short **Note:** line is allowed.
-- **`full_log` = true:** Print the **full** Markdown skeleton (all sections through Reasoning Trail) with the usual **depth** for each written part (topic analysis through deliberation).
-- **Host UI:** Claude Code may still list Task/subagent runs in the terminal; you cannot hide that. Users who want a quieter terminal can omit `--multi-agent`.
-- **`--export json` / `adr`:** Always include **complete** structured content in the export blocks (panel, openings, cross-examination, etc.) even when the main Markdown is compact.
+- **Saved file** (`docs/tribunal/…`, see **Deliverable file**): Always holds the full Tribunal output: `## ⚖️ Tribunal Verdict` using the **compact** skeleton below when `full_log` is false, or the **full** skeleton when `full_log` is true, plus any `### Export (JSON|ADR)` blocks in the **same** file. Include multi-agent **Fallback** / **Note** text in the file (under the verdict header or `**Multi-agent:**`) when applicable—not as chat filler.
+- **Chat (assistant message):** After writing the file, reply with **only** a short confirmation (see **Deliverable file**). Do **not** paste the full verdict, vote tables, or long Markdown into chat. Do **not** narrate subagent trees or cross-exam play-by-play in chat (same as before).
+- **Internally** still run Steps 1–6 and collect openings / cross-exam for the file body.
+- **Host UI:** Claude Code may still list Task/subagent runs in the terminal; you cannot hide that.
+- **`--export json` / `adr`:** Export blocks in the file always contain **complete** structured content (panel, openings, cross-examination, etc.) even when the main verdict Markdown in the file is compact.
 
 ---
 
@@ -79,8 +82,8 @@ Examples:
 
 When **multi_agent** is true:
 
-1. **Try** to delegate using your **Task / subagent** capability (or equivalent) with the plugin agent **`name`** exactly as listed below. Do **not** claim you invoked subagents if you did not. If **full_log** is false, invoke tools **without** narrating them in the user-visible reply (no agent trees, no “Edge *n*” play-by-play).
-2. If you cannot run subagents (no tool, or refusal): if **full_log**, print **`Fallback: multi-agent delegation unavailable; continuing as single-orchestrator simulation.`** If **full_log** is false, print one short line: **`Note: Multi-agent unavailable; single-orchestrator simulation.`** Then simulate openings and cross-examination in this thread.
+1. **Try** to delegate using your **Task / subagent** capability (or equivalent) with the plugin agent **`name`** exactly as listed below. Do **not** claim you invoked subagents if you did not. Do **not** narrate delegations in **chat**; file body receives the synthesized content only.
+2. If you cannot run subagents (no tool, or refusal): if **full_log**, include in the **file** a line under the verdict: **`Fallback: multi-agent delegation unavailable; continuing as single-orchestrator simulation.`** If **full_log** is false, include **`Note: Multi-agent unavailable; single-orchestrator simulation.`** In **chat**, do not paste those long strings unless the file write failed—then summarize in one line. Then simulate openings and cross-examination in this thread.
 
 **Agent names (opening / challenge / defense):**
 
@@ -215,7 +218,7 @@ Use exactly these sections (fill brackets). Omit topic-through-deliberation pros
 [compact: each v_i, \(\bar{v}\), weighted strength; `--min-confidence` outcome if used]
 
 ---
-*The full deliberation was produced internally. Use `/tribunal:deliberate --full-log …` (or `--verbose`, or ask for a full log) to include topic analysis, panel, arguments, cross-examination, and deliberation in this reply.*
+*The full deliberation was produced internally. Use `/tribunal:deliberate --full-log …` (or `--verbose`, or ask for a full log) on a later run to include topic analysis, panel, arguments, cross-examination, and deliberation **in the saved file**.*
 ```
 
 ### When `full_log` is true — Full skeleton
@@ -263,10 +266,35 @@ Use this skeleton (fill all brackets). Omit Panel table in brief mode if you use
 
 ## Export formats
 
-After the main **⚖️ Tribunal Verdict** Markdown (compact or full):
+After the main **⚖️ Tribunal Verdict** Markdown inside the file (compact or full):
 
 - **`--export json`:** Append heading `### Export (JSON)`, then one JSON code fence with: `sessionId`, `topic`, `domain`, `depth`, `fullLog` (boolean), `multiAgentRequested`, `multiAgentDelegationSucceeded` (boolean or null if not requested), `crossExamPermutation` (array of strings, order of challenges), `panel` (array of `{ archetype, label, opening, vote: { position, lean, confidence, rationale, vNumeric } }`), `crossExamination` (array of `{ from, to, challenge, response }`), `verdict` (`decision`, `weightedConsensusStrength`, `minConfidenceGate`, `dissent`, `vBar`), `reasoningTrail` (string). Populate **full** deliberation fields here even when the Markdown verdict above is compact.
 - **`--export adr`:** Append heading `### Export (ADR)`, then a Markdown code fence with mini ADR: `# ADR-…`, `Status` (session id), `Context`, `Decision`, `Consequences`, `Panel metadata`.
+
+---
+
+## Deliverable file (required)
+
+Persist the session to disk unless you are printing **Help** only or aborting before a Topic exists.
+
+1. **Path:** `docs/tribunal/` at the **workspace / project root** (the repo or folder the user has open). Create the directory if missing (`mkdir -p docs/tribunal` when allowed, or rely on the Write tool if it creates parent paths).
+
+2. **Filename:** `{YYYY-MM-DD}_{slug}.md`
+   - **Date:** today’s calendar date as `YYYY-MM-DD` (prefer the user’s timezone if known; otherwise UTC).
+   - **Slug:** From the **full** `$ARGUMENTS` string as given (flags and topic together), trimmed. Lowercase; replace spaces and `/` with `-`; remove characters not in `[a-z0-9_-]`; collapse repeated `-`; trim leading/trailing `-`; **max length 100** (truncate, prefer at a `-` boundary). If the slug is empty, use `session`.
+   - **Collision:** If the file already exists, append `-2`, `-3`, … before `.md` until the path is unused.
+
+3. **Body:** Use the **Write** tool (or equivalent) to write UTF-8 Markdown. The file must start with:
+   - One line: `**Invocation:** /tribunal:deliberate` followed by a space and the **exact** `$ARGUMENTS` text (the user’s flags and topic, unchanged aside from normalizing line breaks to spaces).
+   - Then a blank line.
+   - Then the full `## ⚖️ Tribunal Verdict` document (compact or full per `full_log`) and any export sections. Do not omit content that belongs in the verdict to shorten the file.
+
+4. **Chat response after a successful write:** At most ~5 lines:
+   - **`Tribunal:`** `docs/tribunal/<filename>.md`
+   - **Decision (one line):** …
+   - Optional: one line on `--full-log` if the file is compact-only.
+
+5. **If the file cannot be written:** Say so plainly, then paste the **compact** verdict into chat as a fallback so the user still gets the outcome.
 
 ---
 

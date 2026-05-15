@@ -20,12 +20,12 @@ Votes, \(\bar{v}\), weighted consensus strength, exports, and `--min-confidence`
 ## Token tips
 
 - Prefer **brief** for exploratory questions; use **full** for ADR-worthy or contentious decisions.
-- **`--multi-agent`** increases latency and tool use; use for higher-fidelity openings and cross-exam when subagents are available. Claude Code may still show subagent rows in the terminal; omit `--multi-agent` for a quieter UI, or rely on **compact** mode (default) so the **reply** stays short—add **`--full-log`** when you want the full write-up in the message.
+- **`--multi-agent`** increases latency and tool use; use for higher-fidelity openings and cross-exam when subagents are available. Claude Code may still show subagent rows in the terminal; omit `--multi-agent` for a quieter UI, or rely on **compact** file mode so the **saved** verdict stays short—add **`--full-log`** when you want the full write-up **in the file**.
 
 ## Compact vs full log
 
-- **Default:** Orchestrator prints only the **Compact verdict** (see SKILL.md): topic metadata, Final Verdict, Votes, Reasoning Trail, plus a footer pointing to `--full-log`.
-- **Full:** `--full-log` or `--verbose` restores the full Panel, Arguments, Cross-exam, and Deliberation sections in Markdown.
+- **Default:** The **saved file** under `docs/tribunal/` contains only the **Compact verdict** (see SKILL.md): topic metadata, Final Verdict, Votes, Reasoning Trail, plus a footer pointing to `--full-log`.
+- **Full:** `--full-log` or `--verbose` adds Panel, Arguments, Cross-exam, and Deliberation sections **in that file**. Chat stays a short confirmation either way.
 
 ## Verdict Markdown skeleton (when `full_log`)
 
