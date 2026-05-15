@@ -1,8 +1,10 @@
-# Tribunal (Claude Code plugin)
+# Tribunal
 
 > *Five minds. One verdict. Zero bullshit.*
 
-Structured five-persona deliberation with cross-examination, confidence-weighted verdicts, and optional JSON or ADR export. Spec: [TRIBUNAL_BIBLE.md](TRIBUNAL_BIBLE.md).
+Structured five-persona deliberation with optional **brief** or **full** depth, **conditional votes with lean**, cross-examination, confidence-weighted verdicts, optional **multi-agent** persona delegation, and JSON or ADR export. Spec: [TRIBUNAL_BIBLE.md](TRIBUNAL_BIBLE.md).
+
+Extra detail for authors lives in [skills/deliberate/reference.md](skills/deliberate/reference.md).
 
 ## Install (local dev)
 
@@ -16,30 +18,30 @@ After editing the plugin, run `/reload-plugins` in Claude Code.
 
 ## Command (namespace)
 
-Claude Code namespaces plugin skills as `/plugin-name:skill-name`. This plugin’s canonical invocation is:
+Canonical invocation:
 
 ```text
 /tribunal:deliberate [flags...] <topic>
 ```
 
-The bible uses `/tribunal …` as a shorthand; that maps to `tribunal:deliberate` here.
+### Short `/tribunal` without the namespace
 
-### Optional: short `/tribunal` in one project
-
-Add a project command file (not part of the plugin distribution) that points at the same workflow, for example `.claude/commands/tribunal.md` with body: “Run skill `tribunal:deliberate` with the user’s arguments: …” or paste the skill instructions — see [Claude Code plugins](https://code.claude.com/docs/en/plugins).
+Copy [examples/tribunal-command.md](examples/tribunal-command.md) to **your project’s** `.claude/commands/tribunal.md`. Then **`/tribunal`** forwards to the same protocol as `tribunal:deliberate` (same `$ARGUMENTS`). The plugin must still be loaded.
 
 ## Examples
 
 ```text
 /tribunal:deliberate Should I use PostgreSQL or MongoDB for this project?
 
-/tribunal:deliberate --persona "Pokemon card market expert" Is this card underpriced at €45?
+/tribunal:deliberate --brief --persona "Pokemon card market expert" Is this card underpriced at €45?
 
 /tribunal:deliberate --domain ethical Is it justified to ship a product with known minor bugs?
 
 /tribunal:deliberate --export adr Should we migrate our backend to Edge Functions?
 
 /tribunal:deliberate --min-confidence 85 What's the best clustering algorithm for this dataset?
+
+/tribunal:deliberate --multi-agent --depth full Pick a regional DB vendor
 ```
 
 ## Flags
@@ -47,6 +49,9 @@ Add a project command file (not part of the plugin distribution) that points at 
 | Flag | Purpose |
 |------|---------|
 | `--help` | Usage |
+| `--depth full\|brief` | **full:** rich phases (default). **brief:** condensed phases; same vote math. |
+| `--brief` | Alias for `--depth brief` |
+| `--multi-agent` | Delegate Phase 3 openings + Phase 4 challenge/defense to bundled **persona** subagents when Task/subagent delegation works; otherwise one-line fallback + simulation |
 | `--persona "…"` | Replaces the Domain Expert slot |
 | `--domain …` | Domain hint (e.g. ethical, technical) |
 | `--export md\|json\|adr` | Extra export block (Markdown verdict always shown) |
@@ -54,10 +59,9 @@ Add a project command file (not part of the plugin distribution) that points at 
 
 ## Bundled agents
 
-Under `/agents` when the plugin is loaded:
+**Personas** (for `--multi-agent`): `tribunal-persona-domain-expert`, `tribunal-persona-devils-advocate`, `tribunal-persona-systems-thinker`, `tribunal-persona-logician`, `tribunal-persona-mediator`.
 
-- **topic-analyzer** — topic framing before a full session.
-- **verdict-aggregator** — merge vote text or partial outputs.
+**Helpers:** `topic-analyzer`, `verdict-aggregator` (optional pre/post).
 
 ## Non-goals
 
@@ -68,4 +72,4 @@ Under `/agents` when the plugin is loaded:
 
 ## Version
 
-Plugin manifest: `.claude-plugin/plugin.json` (currently **0.3.0** — dynamic roles, cross-examination, weighted verdict, exports, `min-confidence`).
+Plugin manifest: `.claude-plugin/plugin.json` (**0.4.0** — depth modes, vote `lean`, example `/tribunal` command, multi-agent personas).
