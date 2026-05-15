@@ -25,7 +25,7 @@ Then use **`/tribunal`** from Claude Code the same way you would **`/tribunal:de
    /tribunal:deliberate $ARGUMENTS
    ```
 
-   Use the same protocol, phases, outputs, and flags (`--brief`, `--depth`, `--full-log`, `--verbose`, `--multi-agent`, `--persona`, `--domain`, `--export`, `--min-confidence`, `--help`) defined in that skill.
+   Use the same protocol, outputs, and flags (`--brief`, `--depth`, `--full-log`, `--verbose`, `--multi-agent`, `--persona`, `--domain`, `--export`, `--min-confidence`, `--help`) defined in that skill.
 
 3. **Output:** Produce the **⚖️ Tribunal Verdict** Markdown (and JSON/ADR appendices if requested). Do not replace the skill with a casual chat response.
 

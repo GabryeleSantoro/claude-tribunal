@@ -1,6 +1,6 @@
 {
   "name": "tribunal",
-  "description": "Five-mind deliberation: compact verdict by default, optional --full-log; brief/full depth; vote lean; optional multi-agent; cross-exam; weighted verdict (/tribunal:deliberate).",
+  "description": "Five-mind deliberation: compact verdict by default, optional full write-up (--full-log); brief/full depth; vote lean; optional multi-agent; cross-exam; weighted verdict (/tribunal:deliberate).",
   "version": "0.5.0",
   "author": {
     "name": "Tribunal contributors"

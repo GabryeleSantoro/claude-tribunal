@@ -46,7 +46,7 @@ Whenever you change `SKILL.md`, agents, or `plugin.json`:
 /tribunal:deliberate --brief Choose tabs or spaces for indentation?
 ```
 
-**Full protocol shape (longer)**
+**Full depth (longer deliberation detail when you use `--full-log`)**
 
 ```text
 /tribunal:deliberate --depth full Should we add a nightly CI job?
@@ -64,7 +64,7 @@ Whenever you change `SKILL.md`, agents, or `plugin.json`:
 /tribunal:deliberate --multi-agent --brief Pick a logging library for a small CLI
 ```
 
-The reply defaults to **compact** (verdict + votes + reasoning). Use **`--full-log`** to print every phase in the message. Claude Code may still list subagent tasks in the terminal.
+The reply defaults to **compact** (verdict + votes + reasoning). Use **`--full-log`** for the complete write-up in the message. Claude Code may still list subagent tasks in the terminal.
 
 If `--multi-agent` cannot delegate, the skill should still complete with its documented fallback.
 

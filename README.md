@@ -32,18 +32,36 @@ Copy [examples/tribunal-command.md](examples/tribunal-command.md) to **your proj
 
 ## Examples
 
+### Without `--multi-agent` (single orchestrator)
+
+Same five personas and verdict math; openings and cross-exam are simulated in one model. Good default when you want speed or fewer Task/subagent rows in the terminal.
+
 ```text
-/tribunal:deliberate Should I use PostgreSQL or MongoDB for this project?
+/tribunal:deliberate --brief For a new BFF: PostgreSQL + JSONB vs a document DB for messy nested payloads—what fits our ops and query patterns?
 
-/tribunal:deliberate --brief --persona "Pokemon card market expert" Is this card underpriced at €45?
+/tribunal:deliberate --export adr Adopt strict TypeScript (no implicit any) repo-wide this quarter, including generated and legacy packages?
 
-/tribunal:deliberate --domain ethical Is it justified to ship a product with known minor bugs?
+/tribunal:deliberate --domain technical --min-confidence 85 Replace our in-house job queue with Redis Streams: when is the complexity worth it?
 
-/tribunal:deliberate --export adr Should we migrate our backend to Edge Functions?
+/tribunal:deliberate --brief If CI is green but the bug only reproduces on a leap second and prod is NTP-synced UTC, do we block the release or ship and file "works on my epoch"?
+```
 
-/tribunal:deliberate --min-confidence 85 What's the best clustering algorithm for this dataset?
+### With `--multi-agent` (persona subagents)
 
-/tribunal:deliberate --multi-agent --depth full Pick a regional DB vendor
+Opening statements and cross-examination turns are run by separate **persona** subagents when your environment supports it—you get the same weighted verdict, not a backstage pass to every internal step. Expect more latency; the reply can stay **compact** unless you add `--full-log`.
+
+```text
+/tribunal:deliberate --multi-agent --full-log --depth full We run multi-region active-active; AP-style cached reads are fine for most domains but billing settlement must be linearizable against our ledger. How do we roll out a CRDT-ish edge layer without ever double-charging during partition or failover?
+
+/tribunal:deliberate --multi-agent --brief Expose our product API to integrators as GraphQL, OpenAPI REST, or both with a compatibility layer—what breaks at scale?
+
+/tribunal:deliberate --multi-agent --depth full Zero-trust mTLS between every service vs selective auth for internal east-west traffic in a growing k8s estate—which liability do we own first?
+
+/tribunal:deliberate --multi-agent --persona "SRE lead — payment rail outages" Should we split the monolith along bounded contexts now, or harden observability and split later?
+
+/tribunal:deliberate --multi-agent --export json --brief Rewrite the p99-critical pricing path from interpreted JS to Rust vs optimize and profile in place for two quarters—which bets our latency budget better?
+
+/tribunal:deliberate --multi-agent --domain ethical --min-confidence 70 Ship an opt-out telemetry SDK that phones home crash breadcrumbs for unpaid tiers—privacy vs debuggability tradeoff?
 ```
 
 ## Flags
@@ -51,10 +69,10 @@ Copy [examples/tribunal-command.md](examples/tribunal-command.md) to **your proj
 | Flag | Purpose |
 |------|---------|
 | `--help` | Usage |
-| `--depth full\|brief` | **full:** rich phases when `--full-log` is on (default depth). **brief:** condensed phase content; same vote math. |
+| `--depth full\|brief` | **full:** richer detail when `--full-log` is on (default depth). **brief:** tighter deliberation; same vote math. |
 | `--brief` | Alias for `--depth brief` |
-| `--full-log` / `--verbose` | Print Topic Analysis through Deliberation in the reply. Default: **compact** verdict only (votes, decision, consensus strength). |
-| `--multi-agent` | Delegate Phase 3 openings + Phase 4 challenge/defense to bundled **persona** subagents when Task/subagent delegation works; otherwise one-line fallback + simulation |
+| `--full-log` / `--verbose` | Print the full write-up (panel, arguments, cross-exam, deliberation) in the reply. Default: **compact** verdict only (votes, decision, consensus strength). |
+| `--multi-agent` | Run openings and cross-exam through bundled **persona** subagents when Task/subagent delegation works; otherwise one-line fallback + single-model simulation |
 | `--persona "…"` | Replaces the Domain Expert slot |
 | `--domain …` | Domain hint (e.g. ethical, technical) |
 | `--export md\|json\|adr` | Extra export block (Markdown verdict always shown) |
@@ -75,4 +93,4 @@ Copy [examples/tribunal-command.md](examples/tribunal-command.md) to **your proj
 
 ## Version
 
-Plugin manifest: `.claude-plugin/plugin.json` (**0.5.0** — compact default reply; `--full-log` / `--verbose` for full phase narrative).
+Plugin manifest: `.claude-plugin/plugin.json` (**0.5.0** — compact default reply; `--full-log` / `--verbose` for the full deliberation write-up).

@@ -15,15 +15,15 @@ Supporting detail: optional read [reference.md](reference.md) in this skill fold
 2. Parse **flags** from `$ARGUMENTS` (repeatable `--flag value` where noted). Remaining text (after removing consumed flags) is the **Topic**. If there is no Topic after parsing, print Help and stop.
 3. After parsing, set **depth**: if `--depth full` appears → **full**. Else if `--brief` or `--depth brief` → **brief**. Else → **full** (default).
 4. Set **multi_agent** = true iff `--multi-agent` is present.
-5. Set **full_log** = true iff `--full-log` or `--verbose` appears **or** the user explicitly asks in this turn for the full phase-by-phase output (e.g. “full log”, “show all phases”, “verbose deliberation”). Otherwise **full_log** = **false** (default).
+5. Set **full_log** = true iff `--full-log` or `--verbose` appears **or** the user explicitly asks in this turn for the **full deliberation** in the reply (e.g. “full log”, “show the whole panel”, “verbose deliberation”). Otherwise **full_log** = **false** (default).
 
 ### Flag grammar (preserve quoted strings as single values)
 
 - `--help` — print Help and stop.
 - `--brief` — same as `--depth brief`.
 - `--depth full|brief` — output verbosity (default `full`).
-- `--multi-agent` — delegate Phase 3 openings and Phase 4 challenge/defense to plugin **persona** subagents when the environment supports Task/subagent delegation; otherwise emit **Fallback:** and simulate (see Multi-agent section).
-- `--full-log` / `--verbose` — print **all** phases (1–6 narrative, Panel, Arguments, Cross-exam, Deliberation) in the assistant reply. Default is **compact** output (verdict-focused only); see **Presentation mode**.
+- `--multi-agent` — delegate **opening statements** and **cross-examination** (challenge/defense pairs) to plugin **persona** subagents when the environment supports Task/subagent delegation; otherwise emit **Fallback:** and simulate (see Multi-agent section).
+- `--full-log` / `--verbose` — print the **full deliberation** in the assistant reply (topic analysis through verdict: Panel, Arguments, Cross-exam, Deliberation, votes). Default is **compact** output (verdict-focused only); see **Presentation mode**.
 - `--persona "…"` — custom expert replaces the **Domain Expert** slot (one string; last wins if repeated).
 - `--domain …` — optional domain hint (e.g. `technical`, `ethical`, `strategic`, `creative`). Use as override if the topic is ambiguous.
 - `--export md|json|adr` — primary output format (default: `md`). Always include the Markdown verdict in the reply; when `json` or `adr`, add a second fenced block with that format (see Export section).
@@ -38,9 +38,9 @@ Usage: /tribunal:deliberate [flags...] <topic>
 
 Flags:
   --help                 Show this help
-  --depth full|brief     Rich vs condensed phase *content* when full log is on; default full
+  --depth full|brief     Rich vs condensed deliberation *detail* when full log is on; default full
   --brief                Alias for --depth brief
-  --full-log             Print full phase-by-phase narrative in the reply (default: compact verdict only)
+  --full-log             Full deliberation in the reply—panel, arguments, cross-exam, deliberation, votes (default: compact verdict only)
   --verbose              Same as --full-log
   --multi-agent          Delegate openings + cross-exam to persona subagents (if supported)
   --persona "title"      Custom Domain Expert (replaces default expert slot)
@@ -59,8 +59,8 @@ Examples:
 
 ## Presentation mode (what the user sees)
 
-- **Default (**`full_log` = false**):** Run Phases 1–6 internally (including subagents when `--multi-agent`). In the **assistant message**, print **only** the **Compact verdict** skeleton below. Do **not** print Phase 1–5 section headers, running totals, “Delegating…”, “Running *n* agents…”, per-edge cross-exam narration, or raw subagent transcripts. Do **not** print the Fallback line in compact mode unless delegation failed—in that case one short **Note:** line is allowed.
-- **`full_log` = true:** Print the **full** Markdown skeleton (all sections through Reasoning Trail) with the usual Phase 1–5 content per **depth**.
+- **Default (**`full_log` = false**):** Run the full Tribunal **internally** (including subagents when `--multi-agent`). In the **assistant message**, print **only** the **Compact verdict** skeleton below. Do **not** print intermediate section headers for topic analysis, roles, openings, cross-exam, or deliberation; do **not** narrate “Delegating…”, “Running *n* agents…”, per-edge cross-exam play-by-play, or raw subagent transcripts. Do **not** print the Fallback line in compact mode unless delegation failed—in that case one short **Note:** line is allowed.
+- **`full_log` = true:** Print the **full** Markdown skeleton (all sections through Reasoning Trail) with the usual **depth** for each written part (topic analysis through deliberation).
 - **Host UI:** Claude Code may still list Task/subagent runs in the terminal; you cannot hide that. Users who want a quieter terminal can omit `--multi-agent`.
 - **`--export json` / `adr`:** Always include **complete** structured content in the export blocks (panel, openings, cross-examination, etc.) even when the main Markdown is compact.
 
@@ -80,7 +80,7 @@ Examples:
 When **multi_agent** is true:
 
 1. **Try** to delegate using your **Task / subagent** capability (or equivalent) with the plugin agent **`name`** exactly as listed below. Do **not** claim you invoked subagents if you did not. If **full_log** is false, invoke tools **without** narrating them in the user-visible reply (no agent trees, no “Edge *n*” play-by-play).
-2. If you cannot run subagents (no tool, or refusal): if **full_log**, print **`Fallback: multi-agent delegation unavailable; continuing as single-orchestrator simulation.`** If **full_log** is false, print one short line: **`Note: Multi-agent unavailable; single-orchestrator simulation.`** Then run Phases 3–4 as single-model simulation.
+2. If you cannot run subagents (no tool, or refusal): if **full_log**, print **`Fallback: multi-agent delegation unavailable; continuing as single-orchestrator simulation.`** If **full_log** is false, print one short line: **`Note: Multi-agent unavailable; single-orchestrator simulation.`** Then simulate openings and cross-examination in this thread.
 
 **Agent names (opening / challenge / defense):**
 
@@ -94,38 +94,38 @@ When **multi_agent** is true:
 
 **Procedure:**
 
-- **Phases 1–2** always run in this orchestration thread (topic analysis + role labels + **cross-exam permutation**: assign a 5-cycle or other **permutation** over the five archetypes so each challenges exactly one peer and each is challenged exactly once; record `A → B` edges).
+- **Steps 1–2** always run in this orchestration thread (topic analysis + role labels + **cross-exam permutation**: assign a 5-cycle or other **permutation** over the five archetypes so each challenges exactly one peer and each is challenged exactly once; record `A → B` edges).
 
-- **Phase 3:** Run **five parallel** subagent tasks (one per row above), **Mode: opening**, with a user payload:
+- **Step 3 — openings:** Run **five parallel** subagent tasks (one per row above), **Mode: opening**, with a user payload:
 
   ```text
   Mode: opening
   Topic: <topic>
   Domain: <detected or hint>
-  RoleLabel: <slot label from Phase 2>
+  RoleLabel: <slot label from Step 2>
   CustomExpertContext: <only for Domain Expert: --persona text or "none">
   ```
 
   Collect each opening verbatim into the final output (Arguments Summary / per-persona).
 
-- **Phase 4:** For each directed edge **Challenger → Target** in a **fixed order** (e.g. Domain Expert first as challenger, then follow the cycle), run **sequentially**:
+- **Step 4 — cross-examination:** For each directed edge **Challenger → Target** in a **fixed order** (e.g. Domain Expert first as challenger, then follow the cycle), run **sequentially**:
   1. Subagent for **Challenger**, **Mode: challenge**, payload: Topic, FromArchetype, ToArchetype, ChallengerOpening, TargetOpening.
   2. Subagent for **Target**, **Mode: defense**, payload: Topic, Archetype=Target, ChallengeText, TargetOpening.
 
-- **Phases 5–6** run **only here** in the orchestrator thread (use collected openings + cross-exam text). Simulate deliberation and **all final votes** in this thread so consensus math is single-sourced.
+- **Steps 5–6** run **only here** in the orchestrator thread (use collected openings + cross-exam text). Simulate deliberation and **all final votes** in this thread so consensus math is single-sourced.
 
 When **multi_agent** is false, ignore the subagent procedure and simulate all personas yourself.
 
 ---
 
-## Phase 1 — Topic analysis
+## Step 1 — Topic analysis
 
 From the Topic (and `--domain` if present):
 
 - **If depth = full:** State the **detected domain**; list **key dimensions** (assumptions, constraints, stakeholders, risks); note **facts** vs **uncertainties** in prose.
 - **If depth = brief:** 3–5 bullets covering domain, dimensions, facts vs unknowns only.
 
-## Phase 2 — Role assignment (dynamic casting)
+## Step 2 — Role assignment (dynamic casting)
 
 Five slots, always:
 
@@ -140,24 +140,24 @@ Five slots, always:
 - **If depth = full:** For each slot, assign a **short role label** tailored to the Topic (e.g. "Staff engineer — data modeling"). Include the table in the output under Panel.
 - **If depth = brief:** One line per slot: `Archetype — label`.
 
-**Cross-examination graph (required before Phase 4):** Use a **5-cycle** where each archetype challenges exactly one peer and is challenged exactly once. **Default:** Domain Expert → Devil's Advocate → Systems Thinker → Logician → Mediator → Domain Expert (challenger targets the next in this ring). You may substitute another documented 5-cycle if the topic demands it. List all five directed edges under **Cross-exam map** in the final output.
+**Cross-examination graph (required before cross-examination):** Use a **5-cycle** where each archetype challenges exactly one peer and is challenged exactly once. **Default:** Domain Expert → Devil's Advocate → Systems Thinker → Logician → Mediator → Domain Expert (challenger targets the next in this ring). You may substitute another documented 5-cycle if the topic demands it. List all five directed edges under **Cross-exam map** in the final output.
 
-## Phase 3 — Opening statements
+## Step 3 — Opening statements
 
 - **If depth = full:** For each of the five personas, in order: **initial position** only (no references to others). ~1 short paragraph each — or use subagent openings if **multi_agent** succeeded.
 - **If depth = brief:** 2–4 sentences per persona, no cross-talk — or subagent openings shortened to one short paragraph by you if raw outputs are long.
 
-## Phase 4 — Cross-examination
+## Step 4 — Cross-examination
 
 - **If depth = full:** Each persona directs **exactly one** challenge to the assigned target per the permutation. The challenged persona gives a **brief defense**. Use subagent challenge/defense pairs when **multi_agent** succeeded; otherwise simulate.
 - **If depth = brief:** One subsection **Cross-examination (condensed)**: exactly **five** bullets (one per edge `A → B`), each **one sentence** merging challenge + reply.
 
-## Phase 5 — Deliberation
+## Step 5 — Deliberation
 
 - **If depth = full:** Resolve tensions in prose (what changed after cross-exam, contradictions, open points).
 - **If depth = brief:** 3–6 bullets only.
 
-## Phase 6 — Verdict (votes)
+## Step 6 — Verdict (votes)
 
 Each persona submits:
 
@@ -192,7 +192,7 @@ Generate a **UUID v4** for `Session ID` (hyphenated, lowercase hex).
 
 ### When `full_log` is false — Compact verdict (default)
 
-Use exactly these sections (fill brackets). Omit Phase 1–5 prose here.
+Use exactly these sections (fill brackets). Omit topic-through-deliberation prose here (no Panel / Arguments / Cross-exam / Deliberation sections in the message body).
 
 ```markdown
 ## ⚖️ Tribunal Verdict
@@ -215,7 +215,7 @@ Use exactly these sections (fill brackets). Omit Phase 1–5 prose here.
 [compact: each v_i, \(\bar{v}\), weighted strength; `--min-confidence` outcome if used]
 
 ---
-*Full phase-by-phase deliberation was run internally. Use `/tribunal:deliberate --full-log …` (or `--verbose`, or ask for a full log) to print Topic Analysis, Panel, Arguments, Cross-examination, and Deliberation in the reply.*
+*The full deliberation was produced internally. Use `/tribunal:deliberate --full-log …` (or `--verbose`, or ask for a full log) to include topic analysis, panel, arguments, cross-examination, and deliberation in this reply.*
 ```
 
 ### When `full_log` is true — Full skeleton
