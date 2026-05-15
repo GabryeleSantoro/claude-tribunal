@@ -2,9 +2,13 @@
 
 > *Five minds. One verdict. Zero bullshit.*
 
-Structured five-persona deliberation with optional **brief** or **full** depth, **compact (default) or full-log replies**, **conditional votes with lean**, cross-examination, confidence-weighted verdicts, optional **multi-agent** persona delegation, and JSON or ADR export. Spec: [TRIBUNAL_BIBLE.md](TRIBUNAL_BIBLE.md).
+Structured five-persona deliberation with optional **brief** or **full** depth, **compact (default) or full write-up in the saved file**, **conditional votes with lean**, cross-examination, confidence-weighted verdicts, optional **multi-agent** persona delegation, and JSON or ADR export. Verdicts are written under **`docs/tribunal/`**; the chat reply is a short confirmation. Spec: [TRIBUNAL_BIBLE.md](TRIBUNAL_BIBLE.md) (if present).
 
-Extra detail for authors lives in [skills/deliberate/reference.md](skills/deliberate/reference.md).
+## Output files
+
+Each run (except `--help` / empty topic) creates **`docs/tribunal/{YYYY-MM-DD}_{slug}.md`**. The **`slug`** is a safe form of your **full command arguments** (flags and topic together). Same invocation on the same day adds `-2`, `-3`, … before `.md`. Optional `--export json|adr` appends a block in that file.
+
+Open the Markdown file for the full verdict; use **`--full-log`** for the long deliberation body in the file.
 
 ## Install (local dev)
 
@@ -17,6 +21,8 @@ claude --plugin-dir .
 After editing the plugin, run `/reload-plugins` in Claude Code.
 
 Step-by-step smoke tests: [LOCAL_TESTING.md](LOCAL_TESTING.md).
+
+Extra detail for authors: [skills/deliberate/reference.md](skills/deliberate/reference.md).
 
 ## Command (namespace)
 
@@ -48,7 +54,7 @@ Same five personas and verdict math; openings and cross-exam are simulated in on
 
 ### With `--multi-agent` (persona subagents)
 
-Opening statements and cross-examination turns are run by separate **persona** subagents when your environment supports it—you get the same weighted verdict, not a backstage pass to every internal step. Expect more latency; the reply can stay **compact** unless you add `--full-log`.
+Opening statements and cross-examination turns are run by separate **persona** subagents when your environment supports it—you get the same weighted verdict in **`docs/tribunal/`**, not a backstage pass to every internal step. Expect more latency; the saved file can stay **compact** unless you add `--full-log`.
 
 ```text
 /tribunal:deliberate --multi-agent --full-log --depth full We run multi-region active-active; AP-style cached reads are fine for most domains but billing settlement must be linearizable against our ledger. How do we roll out a CRDT-ish edge layer without ever double-charging during partition or failover?
@@ -71,7 +77,7 @@ Opening statements and cross-examination turns are run by separate **persona** s
 | `--help` | Usage |
 | `--depth full\|brief` | **full:** richer detail when `--full-log` is on (default depth). **brief:** tighter deliberation; same vote math. |
 | `--brief` | Alias for `--depth brief` |
-| `--full-log` / `--verbose` | Print the full write-up (panel, arguments, cross-exam, deliberation) in the reply. Default: **compact** verdict only (votes, decision, consensus strength). |
+| `--full-log` / `--verbose` | Put the long deliberation (panel through deliberation) **in the saved file**. Default file body: compact verdict only. |
 | `--multi-agent` | Run openings and cross-exam through bundled **persona** subagents when Task/subagent delegation works; otherwise one-line fallback + single-model simulation |
 | `--persona "…"` | Replaces the Domain Expert slot |
 | `--domain …` | Domain hint (e.g. ethical, technical) |
@@ -93,4 +99,4 @@ Opening statements and cross-examination turns are run by separate **persona** s
 
 ## Version
 
-Plugin manifest: `.claude-plugin/plugin.json` (**0.5.0** — compact default reply; `--full-log` / `--verbose` for the full deliberation write-up).
+Plugin manifest: `.claude-plugin/plugin.json` (**0.6.0** — verdict saved to `docs/tribunal/{date}_{slug}.md`; short chat confirmation).
