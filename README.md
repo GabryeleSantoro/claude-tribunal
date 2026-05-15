@@ -15,7 +15,7 @@
 
 <br>
 
-[![Version](https://img.shields.io/github/v/release/gabrielesantoro/claude-tribunal?style=for-the-badge&label=&logo=git&logoColor=white)](https://github.com/gabrielesantoro/claude-tribunal/releases)&nbsp;
+[![Version](https://img.shields.io/github/v/release/GabryeleSantoro/claude-tribunal?style=for-the-badge&label=&logo=git&logoColor=white)](https://github.com/GabryeleSantoro/claude-tribunal/releases)&nbsp;
 [![Claude Plugin](https://img.shields.io/badge/Claude_Plugin-CC785C?style=for-the-badge&logo=anthropic&logoColor=white)](https://docs.anthropic.com)&nbsp;
 [![Verdicts](https://img.shields.io/badge/Verdicts→_docs%2Ftribunal%2F-444?style=for-the-badge)](./docs/tribunal/)
 
@@ -280,7 +280,7 @@ v̄ = Σ(vᵢ · cᵢ) / Σcᵢ      where cᵢ = confidence ∈ [0, 100]
 
 <br>
 
-**Releases** &nbsp;·&nbsp; [Local Testing](LOCAL_TESTING.md) &nbsp;·&nbsp; [reference](skills/deliberate/reference.md)
+[Releases](https://github.com/GabryeleSantoro/claude-tribunal/releases) &nbsp;·&nbsp; [Local Testing](LOCAL_TESTING.md) &nbsp;·&nbsp; [reference](skills/deliberate/reference.md)
 
 <br>
 
