@@ -1,17 +1,17 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "claude-tribunal",
-  "description": "Tribunal — five-mind adversarial deliberation panel for Claude Code.",
-  "owner": {
-    "name": "Gabryele Santoro",
-    "url": "https://github.com/GabryeleSantoro"
-  },
-  "plugins": [
-    {
-      "name": "tribunal",
-      "description": "Five-mind deliberation: writes verdict to docs/tribunal/{date}_{slug}.md; brief chat note; optional full write-up via --full-log; brief/full depth; vote lean; optional multi-agent; weighted verdict (/tribunal:deliberate).",
-      "source": "./",
-      "category": "productivity"
-    }
-  ]
+	"name": "claude-tribunal",
+	"description": "Tribunal — five-mind adversarial deliberation panel for Claude Code.",
+	"owner": {
+		"name": "Gabryele Santoro",
+		"url": "https://github.com/GabryeleSantoro"
+	},
+	"plugins": [
+		{
+			"name": "tribunal",
+			"description": "Five-mind deliberation: writes verdict; brief chat note; optional full write-up via --full-log; brief/full depth; vote lean; optional multi-agent; weighted verdict (/tribunal:deliberate).",
+			"source": "./",
+			"category": "productivity",
+			"protocol": "https"
+		}
+	]
 }
