@@ -86,6 +86,40 @@ Votes are **conditional** — each persona can lean toward support or reject wit
 
 ## ▸ Install
 
+### From marketplace (inside Claude Code)
+
+The repo ships [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json), so others can subscribe to the catalog and install the plugin like any marketplace extension.
+
+1. **Add the marketplace** — registers the catalog (nothing installed yet):
+
+   ```
+   /plugin marketplace add GabryeleSantoro/claude-tribunal
+   ```
+
+   Or open `/plugin` → **Marketplaces** → add GitHub `GabryeleSantoro/claude-tribunal`.
+
+2. **Install the plugin** — pulls `tribunal` from that catalog (defaults to user scope; use `/plugin` UI to pick project or local scope):
+
+   ```
+   /plugin install tribunal@claude-tribunal
+   ```
+
+3. **Reload** — pick up skills and commands:
+
+   ```
+   /reload-plugins
+   ```
+
+4. **Invoke** — skill is namespaced by plugin id:
+
+   ```
+   /tribunal:deliberate [flags...] <topic>
+   ```
+
+See also: [Discover and install plugins](https://code.claude.com/docs/en/discover-plugins) · [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces).
+
+### Local development (`--plugin-dir`)
+
 ```bash
 # From the repo root — loads the plugin into Claude Code
 claude --plugin-dir .
@@ -276,11 +310,19 @@ v̄ = Σ(vᵢ · cᵢ) / Σcᵢ      where cᵢ = confidence ∈ [0, 100]
 
 ---
 
+## ▸ License
+
+MIT — free to use, modify, and distribute. See [LICENSE](LICENSE).
+
+<br>
+
+---
+
 <div align="center">
 
 <br>
 
-[Releases](https://github.com/GabryeleSantoro/claude-tribunal/releases) &nbsp;·&nbsp; [Local Testing](LOCAL_TESTING.md) &nbsp;·&nbsp; [reference](skills/deliberate/reference.md)
+[Releases](https://github.com/GabryeleSantoro/claude-tribunal/releases) &nbsp;·&nbsp; [Local Testing](LOCAL_TESTING.md) &nbsp;·&nbsp; [reference](skills/deliberate/reference.md) &nbsp;·&nbsp; [License](LICENSE)
 
 <br>
 
