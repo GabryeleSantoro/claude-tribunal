@@ -15,7 +15,7 @@
 
 <br>
 
-[![Version](https://img.shields.io/badge/v0.6.0-black?style=for-the-badge&logo=git&logoColor=white)](https://github.com/gabrielesantoro/claude-tribunal)&nbsp;
+[![Version](https://img.shields.io/github/v/release/gabrielesantoro/claude-tribunal?style=for-the-badge&label=&logo=git&logoColor=white)](https://github.com/gabrielesantoro/claude-tribunal/releases)&nbsp;
 [![Claude Plugin](https://img.shields.io/badge/Claude_Plugin-CC785C?style=for-the-badge&logo=anthropic&logoColor=white)](https://docs.anthropic.com)&nbsp;
 [![Verdicts](https://img.shields.io/badge/Verdicts→_docs%2Ftribunal%2F-444?style=for-the-badge)](./docs/tribunal/)
 
@@ -234,7 +234,7 @@ docs/tribunal/
 ```
 
 **Default file:** compact verdict — topic metadata, Final Verdict, Votes, Reasoning Trail, footer.  
-**With `--full-log`:** adds Panel, Arguments Summary, Cross-Examination, and Deliberation sections.  
+**With `--full-log`:** adds Panel, Cross-exam map, Arguments Summary, and Cross-Examination Highlights sections.  
 **Chat reply:** always a short confirmation only. The file is the record.
 
 <br>
@@ -280,7 +280,7 @@ v̄ = Σ(vᵢ · cᵢ) / Σcᵢ      where cᵢ = confidence ∈ [0, 100]
 
 <br>
 
-**v0.6.0** &nbsp;·&nbsp; [Spec](TRIBUNAL_BIBLE.md) &nbsp;·&nbsp; [Local Testing](LOCAL_TESTING.md) &nbsp;·&nbsp; [reference](skills/deliberate/reference.md)
+**Releases** &nbsp;·&nbsp; [Local Testing](LOCAL_TESTING.md) &nbsp;·&nbsp; [reference](skills/deliberate/reference.md)
 
 <br>
 
