@@ -2,7 +2,7 @@
 
 > *Five minds. One verdict. Zero bullshit.*
 
-Structured five-persona deliberation with optional **brief** or **full** depth, **conditional votes with lean**, cross-examination, confidence-weighted verdicts, optional **multi-agent** persona delegation, and JSON or ADR export. Spec: [TRIBUNAL_BIBLE.md](TRIBUNAL_BIBLE.md).
+Structured five-persona deliberation with optional **brief** or **full** depth, **compact (default) or full-log replies**, **conditional votes with lean**, cross-examination, confidence-weighted verdicts, optional **multi-agent** persona delegation, and JSON or ADR export. Spec: [TRIBUNAL_BIBLE.md](TRIBUNAL_BIBLE.md).
 
 Extra detail for authors lives in [skills/deliberate/reference.md](skills/deliberate/reference.md).
 
@@ -15,6 +15,8 @@ claude --plugin-dir .
 ```
 
 After editing the plugin, run `/reload-plugins` in Claude Code.
+
+Step-by-step smoke tests: [LOCAL_TESTING.md](LOCAL_TESTING.md).
 
 ## Command (namespace)
 
@@ -49,8 +51,9 @@ Copy [examples/tribunal-command.md](examples/tribunal-command.md) to **your proj
 | Flag | Purpose |
 |------|---------|
 | `--help` | Usage |
-| `--depth full\|brief` | **full:** rich phases (default). **brief:** condensed phases; same vote math. |
+| `--depth full\|brief` | **full:** rich phases when `--full-log` is on (default depth). **brief:** condensed phase content; same vote math. |
 | `--brief` | Alias for `--depth brief` |
+| `--full-log` / `--verbose` | Print Topic Analysis through Deliberation in the reply. Default: **compact** verdict only (votes, decision, consensus strength). |
 | `--multi-agent` | Delegate Phase 3 openings + Phase 4 challenge/defense to bundled **persona** subagents when Task/subagent delegation works; otherwise one-line fallback + simulation |
 | `--persona "…"` | Replaces the Domain Expert slot |
 | `--domain …` | Domain hint (e.g. ethical, technical) |
@@ -72,4 +75,4 @@ Copy [examples/tribunal-command.md](examples/tribunal-command.md) to **your proj
 
 ## Version
 
-Plugin manifest: `.claude-plugin/plugin.json` (**0.4.0** — depth modes, vote `lean`, example `/tribunal` command, multi-agent personas).
+Plugin manifest: `.claude-plugin/plugin.json` (**0.5.0** — compact default reply; `--full-log` / `--verbose` for full phase narrative).

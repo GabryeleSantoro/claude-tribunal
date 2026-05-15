@@ -1,5 +1,5 @@
 ---
-description: Run a Tribunal session—five specialized personas deliberate on a question with cross-examination and a confidence-weighted verdict. Supports brief/full depth, conditional vote lean, optional multi-agent delegation, JSON/ADR export. Invoke when the user runs /tribunal:deliberate or asks for structured multi-perspective deliberation. Not for casual chat.
+description: Run a Tribunal session—five specialized personas deliberate on a question with cross-examination and a confidence-weighted verdict. Supports brief/full depth, compact vs full-log reply, conditional vote lean, optional multi-agent delegation, JSON/ADR export. Invoke when the user runs /tribunal:deliberate or asks for structured multi-perspective deliberation. Not for casual chat.
 disable-model-invocation: true
 ---
 
@@ -15,6 +15,7 @@ Supporting detail: optional read [reference.md](reference.md) in this skill fold
 2. Parse **flags** from `$ARGUMENTS` (repeatable `--flag value` where noted). Remaining text (after removing consumed flags) is the **Topic**. If there is no Topic after parsing, print Help and stop.
 3. After parsing, set **depth**: if `--depth full` appears → **full**. Else if `--brief` or `--depth brief` → **brief**. Else → **full** (default).
 4. Set **multi_agent** = true iff `--multi-agent` is present.
+5. Set **full_log** = true iff `--full-log` or `--verbose` appears **or** the user explicitly asks in this turn for the full phase-by-phase output (e.g. “full log”, “show all phases”, “verbose deliberation”). Otherwise **full_log** = **false** (default).
 
 ### Flag grammar (preserve quoted strings as single values)
 
@@ -22,6 +23,7 @@ Supporting detail: optional read [reference.md](reference.md) in this skill fold
 - `--brief` — same as `--depth brief`.
 - `--depth full|brief` — output verbosity (default `full`).
 - `--multi-agent` — delegate Phase 3 openings and Phase 4 challenge/defense to plugin **persona** subagents when the environment supports Task/subagent delegation; otherwise emit **Fallback:** and simulate (see Multi-agent section).
+- `--full-log` / `--verbose` — print **all** phases (1–6 narrative, Panel, Arguments, Cross-exam, Deliberation) in the assistant reply. Default is **compact** output (verdict-focused only); see **Presentation mode**.
 - `--persona "…"` — custom expert replaces the **Domain Expert** slot (one string; last wins if repeated).
 - `--domain …` — optional domain hint (e.g. `technical`, `ethical`, `strategic`, `creative`). Use as override if the topic is ambiguous.
 - `--export md|json|adr` — primary output format (default: `md`). Always include the Markdown verdict in the reply; when `json` or `adr`, add a second fenced block with that format (see Export section).
@@ -36,8 +38,10 @@ Usage: /tribunal:deliberate [flags...] <topic>
 
 Flags:
   --help                 Show this help
-  --depth full|brief     Verbose (full) vs condensed (brief) phases; default full
+  --depth full|brief     Rich vs condensed phase *content* when full log is on; default full
   --brief                Alias for --depth brief
+  --full-log             Print full phase-by-phase narrative in the reply (default: compact verdict only)
+  --verbose              Same as --full-log
   --multi-agent          Delegate openings + cross-exam to persona subagents (if supported)
   --persona "title"      Custom Domain Expert (replaces default expert slot)
   --domain <hint>        Override domain hint for analysis
@@ -50,7 +54,17 @@ Examples:
   /tribunal:deliberate --domain ethical --min-confidence 85 Ship with minor bugs?
   /tribunal:deliberate --export adr Should we migrate to Edge Functions?
   /tribunal:deliberate --multi-agent --depth full Pick a regional DB leader
+  /tribunal:deliberate --full-log --brief Topic here
 ```
+
+## Presentation mode (what the user sees)
+
+- **Default (**`full_log` = false**):** Run Phases 1–6 internally (including subagents when `--multi-agent`). In the **assistant message**, print **only** the **Compact verdict** skeleton below. Do **not** print Phase 1–5 section headers, running totals, “Delegating…”, “Running *n* agents…”, per-edge cross-exam narration, or raw subagent transcripts. Do **not** print the Fallback line in compact mode unless delegation failed—in that case one short **Note:** line is allowed.
+- **`full_log` = true:** Print the **full** Markdown skeleton (all sections through Reasoning Trail) with the usual Phase 1–5 content per **depth**.
+- **Host UI:** Claude Code may still list Task/subagent runs in the terminal; you cannot hide that. Users who want a quieter terminal can omit `--multi-agent`.
+- **`--export json` / `adr`:** Always include **complete** structured content in the export blocks (panel, openings, cross-examination, etc.) even when the main Markdown is compact.
+
+---
 
 ## Non-goals
 
@@ -65,8 +79,8 @@ Examples:
 
 When **multi_agent** is true:
 
-1. **Try** to delegate using your **Task / subagent** capability (or equivalent) with the plugin agent **`name`** exactly as listed below. Do **not** claim you invoked subagents if you did not.
-2. If you cannot run subagents (no tool, or refusal), print one line: **`Fallback: multi-agent delegation unavailable; continuing as single-orchestrator simulation.`** then run Phases 3–4 as today’s single-model simulation.
+1. **Try** to delegate using your **Task / subagent** capability (or equivalent) with the plugin agent **`name`** exactly as listed below. Do **not** claim you invoked subagents if you did not. If **full_log** is false, invoke tools **without** narrating them in the user-visible reply (no agent trees, no “Edge *n*” play-by-play).
+2. If you cannot run subagents (no tool, or refusal): if **full_log**, print **`Fallback: multi-agent delegation unavailable; continuing as single-orchestrator simulation.`** If **full_log** is false, print one short line: **`Note: Multi-agent unavailable; single-orchestrator simulation.`** Then run Phases 3–4 as single-model simulation.
 
 **Agent names (opening / challenge / defense):**
 
@@ -176,6 +190,36 @@ Generate a **UUID v4** for `Session ID` (hyphenated, lowercase hex).
 
 ## Output format (Markdown, required)
 
+### When `full_log` is false — Compact verdict (default)
+
+Use exactly these sections (fill brackets). Omit Phase 1–5 prose here.
+
+```markdown
+## ⚖️ Tribunal Verdict
+
+**Topic:** …
+**Domain:** …
+**Session ID:** …
+**Depth:** brief | full
+**Multi-agent:** yes | no
+
+### Final Verdict
+**Decision:** …
+**Confidence:** [weighted consensus strength]%
+**Dissent:** [minority opinion, or "None significant"]
+
+### Votes
+[table or bullets: persona → position, lean if conditional, confidence %, rationale, v_i]
+
+### Reasoning Trail
+[compact: each v_i, \(\bar{v}\), weighted strength; `--min-confidence` outcome if used]
+
+---
+*Full phase-by-phase deliberation was run internally. Use `/tribunal:deliberate --full-log …` (or `--verbose`, or ask for a full log) to print Topic Analysis, Panel, Arguments, Cross-examination, and Deliberation in the reply.*
+```
+
+### When `full_log` is true — Full skeleton
+
 Use this skeleton (fill all brackets). Omit Panel table in brief mode if you used one-line slot list under Panel as bullets instead.
 
 ```markdown
@@ -219,9 +263,9 @@ Use this skeleton (fill all brackets). Omit Panel table in brief mode if you use
 
 ## Export formats
 
-After the main **⚖️ Tribunal Verdict** Markdown:
+After the main **⚖️ Tribunal Verdict** Markdown (compact or full):
 
-- **`--export json`:** Append heading `### Export (JSON)`, then one JSON code fence with: `sessionId`, `topic`, `domain`, `depth`, `multiAgentRequested`, `multiAgentDelegationSucceeded` (boolean or null if not requested), `crossExamPermutation` (array of strings, order of challenges), `panel` (array of `{ archetype, label, opening, vote: { position, lean, confidence, rationale, vNumeric } }`), `crossExamination` (array of `{ from, to, challenge, response }`), `verdict` (`decision`, `weightedConsensusStrength`, `minConfidenceGate`, `dissent`, `vBar`), `reasoningTrail` (string).
+- **`--export json`:** Append heading `### Export (JSON)`, then one JSON code fence with: `sessionId`, `topic`, `domain`, `depth`, `fullLog` (boolean), `multiAgentRequested`, `multiAgentDelegationSucceeded` (boolean or null if not requested), `crossExamPermutation` (array of strings, order of challenges), `panel` (array of `{ archetype, label, opening, vote: { position, lean, confidence, rationale, vNumeric } }`), `crossExamination` (array of `{ from, to, challenge, response }`), `verdict` (`decision`, `weightedConsensusStrength`, `minConfidenceGate`, `dissent`, `vBar`), `reasoningTrail` (string). Populate **full** deliberation fields here even when the Markdown verdict above is compact.
 - **`--export adr`:** Append heading `### Export (ADR)`, then a Markdown code fence with mini ADR: `# ADR-…`, `Status` (session id), `Context`, `Decision`, `Consequences`, `Panel metadata`.
 
 ---

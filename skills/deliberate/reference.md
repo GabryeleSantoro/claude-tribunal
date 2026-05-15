@@ -18,11 +18,16 @@ Votes, \(\bar{v}\), weighted consensus strength, exports, and `--min-confidence`
 ## Token tips
 
 - Prefer **brief** for exploratory questions; use **full** for ADR-worthy or contentious decisions.
-- **`--multi-agent`** increases latency and tool use; use for higher-fidelity openings and cross-exam when subagents are available.
+- **`--multi-agent`** increases latency and tool use; use for higher-fidelity openings and cross-exam when subagents are available. Claude Code may still show subagent rows in the terminal; omit `--multi-agent` for a quieter UI, or rely on **compact** mode (default) so the **reply** stays short—add **`--full-log`** when you want every phase in the message.
 
-## Verdict Markdown skeleton (same for both depths)
+## Compact vs full log
 
-Use the skeleton in SKILL.md. In brief mode you may shorten **Arguments Summary** but keep all section headings present.
+- **Default:** Orchestrator prints only the **Compact verdict** (see SKILL.md): topic metadata, Final Verdict, Votes, Reasoning Trail, plus a footer pointing to `--full-log`.
+- **Full:** `--full-log` or `--verbose` restores the full Panel, Arguments, Cross-exam, and Deliberation sections in Markdown.
+
+## Verdict Markdown skeleton (when `full_log`)
+
+Use the **full** skeleton in SKILL.md. With **brief** depth, shorten **Arguments Summary** but keep all section headings present.
 
 ## Multi-agent: plugin agent `name` values
 
