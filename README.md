@@ -1,6 +1,6 @@
 # Tribunal
 
-> *Five minds. One verdict. Zero bullshit.*
+> _Five minds. One verdict. Zero bullshit._
 
 Structured five-persona deliberation with optional **brief** or **full** depth, **compact (default) or full write-up in the saved file**, **conditional votes with lean**, cross-examination, confidence-weighted verdicts, optional **multi-agent** persona delegation, and JSON or ADR export. Verdicts are written under **`docs/tribunal/`**; the chat reply is a short confirmation. Spec: [TRIBUNAL_BIBLE.md](TRIBUNAL_BIBLE.md) (if present).
 
@@ -72,17 +72,17 @@ Opening statements and cross-examination turns are run by separate **persona** s
 
 ## Flags
 
-| Flag | Purpose |
-|------|---------|
-| `--help` | Usage |
-| `--depth full\|brief` | **full:** richer detail when `--full-log` is on (default depth). **brief:** tighter deliberation; same vote math. |
-| `--brief` | Alias for `--depth brief` |
-| `--full-log` / `--verbose` | Put the long deliberation (panel through deliberation) **in the saved file**. Default file body: compact verdict only. |
-| `--multi-agent` | Run openings and cross-exam through bundled **persona** subagents when Task/subagent delegation works; otherwise one-line fallback + single-model simulation |
-| `--persona "…"` | Replaces the Domain Expert slot |
-| `--domain …` | Domain hint (e.g. ethical, technical) |
-| `--export md\|json\|adr` | Extra export block (Markdown verdict always shown) |
-| `--min-confidence N` | Gate: flag weak consensus (0–100) |
+| Flag                       | Purpose                                                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--help`                   | Usage                                                                                                                                                        |
+| `--depth full\|brief`      | **full:** richer detail when `--full-log` is on (default depth). **brief:** tighter deliberation; same vote math.                                            |
+| `--brief`                  | Alias for `--depth brief`                                                                                                                                    |
+| `--full-log` / `--verbose` | Put the long deliberation (panel through deliberation) **in the saved file**. Default file body: compact verdict only.                                       |
+| `--multi-agent`            | Run openings and cross-exam through bundled **persona** subagents when Task/subagent delegation works; otherwise one-line fallback + single-model simulation |
+| `--persona "…"`            | Replaces the Domain Expert slot                                                                                                                              |
+| `--domain …`               | Domain hint (e.g. ethical, technical)                                                                                                                        |
+| `--export md\|json\|adr`   | Extra export block (Markdown verdict always shown)                                                                                                           |
+| `--min-confidence N`       | Gate: flag weak consensus (0–100)                                                                                                                            |
 
 ## Bundled agents
 
