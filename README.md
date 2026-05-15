@@ -46,21 +46,21 @@ Built for decisions that deserve more than a single model's gut feeling.
            └──────────────────────┬──────────────────────┘
                                   │
                     ┌─────────────▼─────────────┐
-                    │      Opening Statements    │
-                    │   (one position per role)  │
+                    │      Opening Statements   │
+                    │   (one position per role) │
                     └─────────────┬─────────────┘
                                   │
                     ┌─────────────▼─────────────┐
-                    │      Cross-Examination     │
-                    │  5-cycle: each challenges  │
-                    │  exactly one peer, defends │
-                    │  against exactly one       │
+                    │      Cross-Examination    │
+                    │  5-cycle: each challenges │
+                    │  exactly one peer, defends│
+                    │  against exactly one      │
                     └─────────────┬─────────────┘
                                   │
                     ┌─────────────▼─────────────┐
-                    │    Confidence-Weighted     │
-                    │          Verdict           │
-                    │  v̄ = Σ(vᵢ · cᵢ) / Σcᵢ    │
+                    │    Confidence-Weighted    │
+                    │          Verdict          │
+                    │  v̄ = Σ(vᵢ · cᵢ) / Σcᵢ     │
                     └─────────────┬─────────────┘
                                   │
                     docs/tribunal/{date}_{slug}.md
@@ -87,8 +87,6 @@ Votes are **conditional** — each persona can lean toward support or reject wit
 ## ▸ Install
 
 ### From marketplace (inside Claude Code)
-
-The repo ships [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json), so others can subscribe to the catalog and install the plugin like any marketplace extension.
 
 1. **Add the marketplace** — registers the catalog (nothing installed yet):
 
