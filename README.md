@@ -11,7 +11,7 @@
    ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
 ```
 
-### *Five minds. One verdict. Zero bullshit.*
+### _Five minds. One verdict. Zero bullshit._
 
 <br>
 
@@ -70,13 +70,13 @@ Built for decisions that deserve more than a single model's gut feeling.
 
 Each role has a fixed adversarial function:
 
-| Persona | Function |
-|---|---|
-| **Domain Expert** | Field authority. Facts over assumptions. Replaceable via `--persona`. |
-| **Devil's Advocate** | Stress-tests every position. Exists to break weak arguments. |
-| **Systems Thinker** | Second and third-order effects. What are you not seeing? |
-| **Logician** | Internal consistency. Surfaces hidden premises and contradictions. |
-| **Mediator** | Synthesizes tensions into a verdict the panel can live with. |
+| Persona              | Function                                                              |
+| -------------------- | --------------------------------------------------------------------- |
+| **Domain Expert**    | Field authority. Facts over assumptions. Replaceable via `--persona`. |
+| **Devil's Advocate** | Stress-tests every position. Exists to break weak arguments.          |
+| **Systems Thinker**  | Second and third-order effects. What are you not seeing?              |
+| **Logician**         | Internal consistency. Surfaces hidden premises and contradictions.    |
+| **Mediator**         | Synthesizes tensions into a verdict the panel can live with.          |
 
 Votes are **conditional** — each persona can lean toward support or reject without full commitment. The weighted average decides.
 
@@ -118,16 +118,16 @@ For step-by-step smoke tests: [LOCAL_TESTING.md](LOCAL_TESTING.md) · For implem
 
 <br>
 
-| Flag | Values | Effect |
-|---|---|---|
-| `--depth` | `full` \| `brief` | **full** (default): rich topic analysis, full opening paragraphs, prose deliberation. **brief**: tighter, same vote math. |
-| `--brief` | — | Shorthand for `--depth brief`. |
-| `--full-log` / `--verbose` | — | Write the complete deliberation (panel, arguments, cross-exam) to the output file. Default: compact verdict only. |
-| `--multi-agent` | — | Spawn each persona as a real subagent. Same weighted verdict, higher fidelity, more latency. |
-| `--persona "…"` | string | Replace the Domain Expert slot with a named custom expert. |
-| `--domain …` | string | Domain hint — e.g. `ethical`, `technical`, `legal`. Shapes role labels. |
-| `--export` | `md` \| `json` \| `adr` | Append an extra export block to the output file. Markdown verdict is always written. |
-| `--min-confidence N` | `0`–`100` | Flag weak consensus: warn when weighted confidence falls below N. |
+| Flag                       | Values                  | Effect                                                                                                                    |
+| -------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `--depth`                  | `full` \| `brief`       | **full** (default): rich topic analysis, full opening paragraphs, prose deliberation. **brief**: tighter, same vote math. |
+| `--brief`                  | —                       | Shorthand for `--depth brief`.                                                                                            |
+| `--full-log` / `--verbose` | —                       | Write the complete deliberation (panel, arguments, cross-exam) to the output file. Default: compact verdict only.         |
+| `--multi-agent`            | —                       | Spawn each persona as a real subagent. Same weighted verdict, higher fidelity, more latency.                              |
+| `--persona "…"`            | string                  | Replace the Domain Expert slot with a named custom expert.                                                                |
+| `--domain …`               | string                  | Domain hint — e.g. `ethical`, `technical`, `legal`. Shapes role labels.                                                   |
+| `--export`                 | `md` \| `json` \| `adr` | Append an extra export block to the output file. Markdown verdict is always written.                                      |
+| `--min-confidence N`       | `0`–`100`               | Flag weak consensus: warn when weighted confidence falls below N.                                                         |
 
 <br>
 
@@ -245,13 +245,13 @@ docs/tribunal/
 
 Each persona returns a position, optional lean, and confidence score:
 
-| Position | Lean | Vote value `vᵢ` |
-|---|---|---|
-| support | — | `+1` |
-| reject | — | `−1` |
-| conditional | toward\_support | `+0.5` |
-| conditional | neutral | `0` |
-| conditional | toward\_reject | `−0.5` |
+| Position    | Lean           | Vote value `vᵢ` |
+| ----------- | -------------- | --------------- |
+| support     | —              | `+1`            |
+| reject      | —              | `−1`            |
+| conditional | toward_support | `+0.5`          |
+| conditional | neutral        | `0`             |
+| conditional | toward_reject  | `−0.5`          |
 
 Weighted consensus:
 
@@ -284,7 +284,7 @@ v̄ = Σ(vᵢ · cᵢ) / Σcᵢ      where cᵢ = confidence ∈ [0, 100]
 
 <br>
 
-*The panel is always in session.*
+_The panel is always in session._
 
 <br>
 
