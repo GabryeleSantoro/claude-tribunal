@@ -100,10 +100,26 @@ From the repo root:
 cd benchmarks
 python3 -m venv .venv && source .venv/bin/activate   # optional
 pip install -r requirements.txt
-export ANTHROPIC_API_KEY=...
-# Optional: TRIBUNAL_BENCHMARK_MODEL, TRIBUNAL_BENCHMARK_MAX_TOKENS, TRIBUNAL_BENCHMARK_JUDGE_MODEL
-python run_benchmarks.py --dry-run    # planned cases only (no API)
-python run_benchmarks.py              # runs cases in cases.json
+python run_benchmarks.py --dry-run    # planned cases only (no API keys)
 ```
 
-Add **`--judge-model claude-haiku-4-20250314`** (or set `TRIBUNAL_BENCHMARK_JUDGE_MODEL`) for a second call that scores structure / verdict math / topic fit (extra tokens and latency).
+**Anthropic (Messages API — default backend)**
+
+```bash
+export ANTHROPIC_API_KEY=...
+python run_benchmarks.py
+```
+
+**OpenRouter (OpenAI-compatible Chat API)**
+
+Uses `OPENROUTER_API_KEY` and OpenRouter **model slugs** (e.g. `anthropic/claude-sonnet-4`). Optional: `OPENROUTER_HTTP_REFERRER` / `OPENROUTER_APP_NAME`, `OPENROUTER_BASE_URL`, `TRIBUNAL_BENCHMARK_TEMPERATURE`.
+
+```bash
+export OPENROUTER_API_KEY=...
+export TRIBUNAL_BENCHMARK_BACKEND=openrouter   # or: python run_benchmarks.py --backend openrouter
+python run_benchmarks.py --model anthropic/claude-sonnet-4
+```
+
+Shared env knobs: **TRIBUNAL_BENCHMARK_MODEL** (or **OPENROUTER_BENCHMARK_MODEL** for a slug used only under OpenRouter), **TRIBUNAL_BENCHMARK_MAX_TOKENS**, **TRIBUNAL_BENCHMARK_JUDGE_MODEL** (grading model id must match your backend—Anthropic id vs OpenRouter slug).
+
+Use **`--judge-model`** (or **`TRIBUNAL_BENCHMARK_JUDGE_MODEL`**) for a second call that scores structure / verdict math / topic fit (extra tokens and latency).
