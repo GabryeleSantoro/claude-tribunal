@@ -1,0 +1,36 @@
+# Publish a GitHub Release for every pushed semver tag. Version is always the tag
+# that triggered the workflow (github.ref_name); plugin.json must match (without "v").
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify plugin.json matches tag
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          strip_v="${TAG_NAME#v}"
+          plugin="$(jq -r '.version' .claude-plugin/plugin.json)"
+          if [ "$strip_v" != "$plugin" ]; then
+            echo "::error title=Version mismatch::Tag $TAG_NAME implies version $strip_v but .claude-plugin/plugin.json has $plugin"
+            exit 1
+          fi
+
+      - name: Create GitHub Release (${{ github.ref_name }})
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
