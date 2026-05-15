@@ -145,7 +145,6 @@ Every Tribunal session produces a structured output:
 - **Runtime:** Claude Code Plugin (MCP-compatible)
 - **Orchestration:** Multi-agent sub-agent spawning via Claude Code SDK
 - **Export:** Markdown ADR, JSON structured output
-- **Optional integration:** n8n webhook trigger, Supabase session storage
 
 ### Plugin Entry Points
 ```
@@ -188,10 +187,6 @@ Input
 - [ ] Confidence-weighted verdict
 - [ ] Dissenting opinion
 - [ ] JSON + ADR export
-
-### v0.4 — Integrations
-- [ ] n8n webhook trigger support
-- [ ] Supabase session storage (history + search)
 - [ ] `--min-confidence` threshold flag
 
 ### v1.0 — Public Release

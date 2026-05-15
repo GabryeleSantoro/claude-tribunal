@@ -66,10 +66,6 @@ Under `/agents` when the plugin is loaded:
 - Does not replace human judgment.
 - Split verdicts with dissent are valid outcomes.
 
-## v0.4+ integrations (spec only)
-
-Future work (not implemented in this repo): optional bundled MCP (e.g. session persistence in **Supabase**), **n8n** webhook triggers, and CI-style runs via **Claude Agent SDK**. Core deliberation stays in `skills/deliberate/SKILL.md` until those land.
-
 ## Version
 
 Plugin manifest: `.claude-plugin/plugin.json` (currently **0.3.0** — dynamic roles, cross-examination, weighted verdict, exports, `min-confidence`).
