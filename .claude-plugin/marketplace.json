@@ -8,12 +8,9 @@
 	},
 	"plugins": [
 		{
-			"name": "tribunal",
+			"name": "claude-tribunal",
 			"description": "Five-mind deliberation: writes verdict; brief chat note; optional full write-up via --full-log; brief/full depth; vote lean; optional multi-agent; weighted verdict (/tribunal:deliberate).",
-			"source": {
-				"source": "github",
-				"url": "GabryeleSantoro/claude-tribunal.git"
-			},
+			"source": "./",
 			"category": "productivity",
 			"protocol": "https"
 		}
