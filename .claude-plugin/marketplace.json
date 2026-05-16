@@ -11,8 +11,8 @@
 			"name": "tribunal",
 			"description": "Five-mind deliberation: writes verdict; brief chat note; optional full write-up via --full-log; brief/full depth; vote lean; optional multi-agent; weighted verdict (/tribunal:deliberate).",
 			"source": {
-				"type": "url",
-				"url": "https://github.com/GabryeleSantoro/claude-tribunal.git"
+				"source": "github",
+				"url": "GabryeleSantoro/claude-tribunal.git"
 			},
 			"category": "productivity",
 			"protocol": "https"
