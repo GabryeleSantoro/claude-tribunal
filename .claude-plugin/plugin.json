@@ -1,5 +1,5 @@
 {
-	"name": "tribunal",
+	"name": "claude-tribunal",
 	"description": "Five-mind deliberation: writes verdict to docs/tribunal/{date}_{slug}.md; brief chat note; optional full write-up via --full-log; brief/full depth; vote lean; optional multi-agent; weighted verdict (/tribunal:deliberate).",
 	"version": "0.0.2",
 	"author": {
