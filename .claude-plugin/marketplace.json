@@ -1,4 +1,5 @@
 {
+	"$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
 	"name": "claude-tribunal",
 	"description": "Tribunal — five-mind adversarial deliberation panel for Claude Code.",
 	"owner": {
@@ -9,7 +10,10 @@
 		{
 			"name": "tribunal",
 			"description": "Five-mind deliberation: writes verdict; brief chat note; optional full write-up via --full-log; brief/full depth; vote lean; optional multi-agent; weighted verdict (/tribunal:deliberate).",
-			"source": "./",
+			"source": {
+				"type": "url",
+				"url": "https://github.com/GabryeleSantoro/claude-tribunal.git"
+			},
 			"category": "productivity",
 			"protocol": "https"
 		}
