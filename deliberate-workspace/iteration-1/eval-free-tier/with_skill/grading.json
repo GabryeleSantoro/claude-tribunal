@@ -1,0 +1,33 @@
+{
+  "run_id": "eval-free-tier-with_skill",
+  "grader": "automated_assertion_checker",
+  "timestamp": "2026-05-29T19:50:00Z",
+  "expectations": [
+    {
+      "text": "Output contains '## ⚖️ Tribunal Verdict' header",
+      "passed": true,
+      "evidence": "Header present at line 3"
+    },
+    {
+      "text": "Output uses condensed format (brief depth), not full detailed arguments",
+      "passed": true,
+      "evidence": "Panel uses one-line slot descriptions (line 11-16); Arguments Summary is condensed (lines 22-31); Cross-Examination condensed to 5 bullets (lines 33-43), demonstrating brief depth"
+    },
+    {
+      "text": "Output shows strategic/business domain focus in role labels",
+      "passed": true,
+      "evidence": "Role labels emphasize business/strategic perspective: 'Business strategist', 'Market risk challenger', 'Platform ecosystem', 'Financial & operational validity', 'Stakeholder fairness'"
+    },
+    {
+      "text": "Output contains weighted consensus strength value",
+      "passed": true,
+      "evidence": "Line 69: 'Weighted consensus strength = |0.0366| × 100 = **4%**'"
+    },
+    {
+      "text": "Output lists panel with 5 personas",
+      "passed": true,
+      "evidence": "Panel section (lines 11-16) lists all 5 personas with strategic labels"
+    }
+  ],
+  "pass_rate": 1.0
+}
