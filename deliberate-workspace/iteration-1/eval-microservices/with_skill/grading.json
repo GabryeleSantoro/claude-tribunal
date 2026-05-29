@@ -1,0 +1,43 @@
+{
+  "run_id": "eval-microservices-with_skill",
+  "grader": "automated_assertion_checker",
+  "timestamp": "2026-05-29T19:50:00Z",
+  "expectations": [
+    {
+      "text": "Output contains '## ⚖️ Tribunal Verdict' header",
+      "passed": true,
+      "evidence": "Header found at line 3 of output"
+    },
+    {
+      "text": "Output lists all 5 personas (Domain Expert, Devil's Advocate, Systems Thinker, Logician, Mediator)",
+      "passed": true,
+      "evidence": "All 5 personas present in Panel section (lines 17-23)"
+    },
+    {
+      "text": "Output contains a numeric weighted consensus strength value (0-100)",
+      "passed": true,
+      "evidence": "Line 122: 'Weighted consensus strength: 11%' (rounded from 11.49%)"
+    },
+    {
+      "text": "Output contains 'Cross-Examination' or 'cross-exam' section",
+      "passed": true,
+      "evidence": "Section present starting at line 64"
+    },
+    {
+      "text": "Output contains a vote table or list showing positions for each persona",
+      "passed": true,
+      "evidence": "Full vote table with position, lean, confidence, rationale, v_i at lines 106-114"
+    },
+    {
+      "text": "Output contains 'Final Verdict' or 'Decision:' section with a clear recommendation",
+      "passed": true,
+      "evidence": "Final Verdict section at line 118 with clear recommendation: 'Do not proceed with a full microservices migration at this time. Instead, run a focused 6-month pilot...'"
+    },
+    {
+      "text": "Output contains a Session ID (UUID format)",
+      "passed": true,
+      "evidence": "Line 9: 'Session ID: 5a8e2c19-7f4d-4b6a-9d2e-1c8f7a3e5b92'"
+    }
+  ],
+  "pass_rate": 1.0
+}

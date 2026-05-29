@@ -1,0 +1,23 @@
+{
+  "skill_name": "deliberate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "/tribunal:deliberate --depth full We're migrating our monolith to microservices. DevOps says it saves ops overhead, but our senior engineer worries about debugging complexity and network latency. Cost is neutral over 2 years. Should we go ahead?",
+      "expected_output": "Structured verdict with five persona positions on microservices migration, weighted consensus, confidence score, and dissent if present",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "/tribunal:deliberate --depth full --min-confidence 70 Ship an opt-out telemetry SDK that phones home to analytics. Users can disable it, but it's on by default. Revenue upside is clear; privacy concerns exist but legal says we're compliant. Should we ship?",
+      "expected_output": "Verdict evaluating ethical/compliance tradeoffs with confidence gate at 70%, panel positions on telemetry, dissent highlighted if below threshold",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "/tribunal:deliberate --brief --domain strategic Sunset the free tier in 6 months, require $99/month minimum. Current free users are 40% of usage but <5% of revenue. Keeps operations lean; risks losing dev adoption. Proceed?",
+      "expected_output": "Brief-depth verdict on free tier sunset, strategic domain focus, weighted consensus on business decision with dissent",
+      "files": []
+    }
+  ]
+}

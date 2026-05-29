@@ -1,0 +1,42 @@
+{
+  "eval_id": 1,
+  "eval_name": "technical-microservices-migration",
+  "prompt": "/tribunal:deliberate --depth full We're migrating our monolith to microservices. DevOps says it saves ops overhead, but our senior engineer worries about debugging complexity and network latency. Cost is neutral over 2 years. Should we go ahead?",
+  "assertions": [
+    {
+      "name": "verdict-header-present",
+      "description": "Output contains '## ⚖️ Tribunal Verdict' header",
+      "type": "string_match"
+    },
+    {
+      "name": "five-personas-present",
+      "description": "Output lists all 5 personas (Domain Expert, Devil's Advocate, Systems Thinker, Logician, Mediator)",
+      "type": "string_contains_all"
+    },
+    {
+      "name": "weighted-consensus-present",
+      "description": "Output contains a numeric weighted consensus strength value (0-100)",
+      "type": "numeric_extraction"
+    },
+    {
+      "name": "cross-exam-section",
+      "description": "Output contains 'Cross-Examination' or 'cross-exam' section",
+      "type": "string_match"
+    },
+    {
+      "name": "vote-table-present",
+      "description": "Output contains a vote table or list showing positions for each persona",
+      "type": "string_contains"
+    },
+    {
+      "name": "final-decision-present",
+      "description": "Output contains 'Final Verdict' or 'Decision:' section with a clear recommendation",
+      "type": "string_contains"
+    },
+    {
+      "name": "session-id-present",
+      "description": "Output contains a Session ID (UUID format)",
+      "type": "regex_match"
+    }
+  ]
+}

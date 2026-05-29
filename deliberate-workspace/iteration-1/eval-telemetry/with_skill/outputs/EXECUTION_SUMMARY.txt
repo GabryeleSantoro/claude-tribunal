@@ -1,0 +1,100 @@
+TRIBUNAL SKILL EXECUTION SUMMARY
+================================================================================
+Date: 2026-05-29
+Test: Telemetry SDK Decision (Ethics + Compliance with Confidence Gate)
+
+INVOCATION
+----------
+/tribunal:deliberate --depth full --min-confidence 70 Ship an opt-out telemetry SDK that phones home to analytics. Users can disable it, but it's on by default. Revenue upside is clear; privacy concerns exist but legal says we're compliant. Should we ship?
+
+EXECUTION RESULTS
+-----------------
+Status: SUCCESS - Full tribunal deliberation executed per SKILL.md protocol
+
+Output File: 2026-05-29_ship-opt-out-telemetry-sdk-min-confidence-70.md
+Location: /Users/gabrielesantoro/claude-tribunal/deliberate-workspace/iteration-1/eval-telemetry/with_skill/outputs/
+Size: 13 KB, 168 lines
+
+PROTOCOL COMPLIANCE
+-------------------
+✓ Step 1 (Topic Analysis): Complete - domain detected, key dimensions listed, facts vs uncertainties separated
+✓ Step 2 (Panel & Cross-exam): Complete - 5 personas assigned with role labels, 5-cycle permutation defined
+✓ Step 3 (Openings): Complete - all 5 personas provided initial positions (full depth, ~1 paragraph each)
+✓ Step 4 (Cross-examination): Complete - all 5 directed challenges and responses documented
+✓ Step 5 (Deliberation): Complete - post-cross-exam synthesis and key insights extracted
+✓ Step 6 (Votes & Consensus): Complete - all votes recorded with confidence scores, weighted math executed
+
+VERDICT SUMMARY
+---------------
+Final Decision: THRESHOLD NOT MET (min-confidence 70 required)
+
+Weighted Consensus Strength: 23%
+Reasoning:
+- Domain Expert (70% conf): +1.0 (support)
+- Devil's Advocate (85% conf): -1.0 (reject)
+- Systems Thinker (65% conf): -0.5 (conditional toward_reject)
+- Logician (75% conf): -0.5 (conditional toward_reject)
+- Mediator (80% conf): 0.0 (conditional neutral)
+
+Weighted consensus: -0.2267, strength = 23%
+
+Key Finding: Split panel. 60% of weight (Systems Thinker + Logician) leans toward reject with conditional recommendation for opt-in pilot. Domain Expert supports (18.67% weight), Mediator neutral but leaning pilot (21.33% weight).
+
+Recommendation: Conduct 4-6 week opt-in pilot to resolve unknowns before shipping default-on telemetry.
+
+SKILL FEATURES TESTED
+---------------------
+✓ --depth full: Produced full deliberation skeleton with all sections
+✓ --min-confidence 70: Correctly evaluated weighted consensus strength and flagged threshold not met
+✓ Full-log mode: All deliberation sections (topic analysis through deliberation) included in file body
+✓ Confidence-weighted voting: Math verified - weighted consensus correctly computed
+✓ File naming: Proper format {YYYY-MM-DD}_{slug}.md with invocation line at top
+✓ Dissent tracking: Significant minority recorded and highlighted
+✓ Conditional votes: Properly handled with lean directions and v_i numeric mapping
+
+STRENGTHS OBSERVED
+------------------
+1. Thorough ethical analysis: Cross-examination surfaced key tensions (compliance vs ethics, business value vs trust)
+2. Evidence gaps identified: Logician effectively challenged unproven revenue assumptions
+3. Ecosystem thinking: Systems Thinker's analysis of precedent and feedback loops was substantive
+4. Procedural fairness: Mediator role forced exploration of alternatives and unknowns
+5. Confidence gate worked: Low threshold (23%) correctly prevented false confidence in a split decision
+
+EDGE CASES / OBSERVATIONS
+--------------------------
+1. Fallback paradox: Domain Expert's own fallback (switch to opt-in if needed) was pointed out by Mediator as undermining the opt-out-now position. This created internal inconsistency.
+2. Conditional-neutral vote (Mediator): v_i = 0 correctly weighted but creates subtle message that Mediator is truly undecided vs. neutral on the specific question. File body clarified intent well.
+3. Dark pattern framing: Devil's Advocate reframed transparency/compliance distinction effectively; this may reflect real-world UX privacy tensions.
+
+OUTPUT FORMAT VALIDATION
+------------------------
+✓ Invocation line preserved verbatim at top
+✓ Proper heading hierarchy (##, ###, ####)
+✓ All required sections present (Panel, Cross-exam map, Arguments, Cross-exam Highlights, Deliberation, Votes, Final Verdict, Reasoning Trail)
+✓ Vote table properly formatted
+✓ Weighted consensus math shown step-by-step
+✓ Session ID (UUID v4) generated
+✓ Dissent section included due to <80% confidence + 60% lean group
+
+CONFIDENCE GATE BEHAVIOR
+------------------------
+User requested: --min-confidence 70
+Computed strength: 23%
+Result: Correctly rejected as below threshold
+File output: "The panel did not reach the user's confidence threshold (70%)." statement in Final Verdict, per SKILL.md spec
+Fallback recommendation: Provided clear next step (opt-in pilot)
+
+RECOMMENDATIONS FOR FURTHER TESTING
+------------------------------------
+1. Test with multi-agent delegation (--multi-agent flag) if plugin agents available
+2. Test with custom persona (--persona flag) to verify role substitution
+3. Test compact mode (--full-log omitted) to verify only verdict section in file body
+4. Test other export formats (--export json|adr) if JSON/ADR export implemented
+5. Test edge cases: min-confidence 0 (all pass), min-confidence 100 (rarely pass)
+6. Test brief depth mode (--depth brief) vs full for brevity comparison
+7. Test topic analysis domain detection edge cases (ambiguous topics, technical vs ethical dimensions)
+
+CONCLUSION
+----------
+Tribunal skill executed successfully per protocol. Confidence gate and weighted consensus math working as specified. Full deliberation produced substantive cross-examination and identified actionable recommendation (pilot opt-in before shipping opt-out default). Output saved and ready for review.
+

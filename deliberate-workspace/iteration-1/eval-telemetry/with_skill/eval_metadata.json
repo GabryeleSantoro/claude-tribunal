@@ -1,0 +1,32 @@
+{
+  "eval_id": 2,
+  "eval_name": "ethical-telemetry-sdk",
+  "prompt": "/tribunal:deliberate --depth full --min-confidence 70 Ship an opt-out telemetry SDK that phones home to analytics. Users can disable it, but it's on by default. Revenue upside is clear; privacy concerns exist but legal says we're compliant. Should we ship?",
+  "assertions": [
+    {
+      "name": "verdict-header-present",
+      "description": "Output contains '## ⚖️ Tribunal Verdict' header",
+      "type": "string_match"
+    },
+    {
+      "name": "five-personas-present",
+      "description": "Output lists all 5 personas",
+      "type": "string_contains_all"
+    },
+    {
+      "name": "confidence-gate-applied",
+      "description": "Output mentions the 70% confidence threshold and evaluates against it",
+      "type": "string_contains"
+    },
+    {
+      "name": "weighted-consensus-calculated",
+      "description": "Output shows weighted consensus strength value",
+      "type": "numeric_extraction"
+    },
+    {
+      "name": "dissent-section",
+      "description": "Output includes a Dissent section addressing minority views",
+      "type": "string_contains"
+    }
+  ]
+}
