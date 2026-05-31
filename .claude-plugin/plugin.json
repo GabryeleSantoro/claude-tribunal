@@ -7,10 +7,5 @@
 		"name": "Gabryele Santoro",
 		"url": "https://github.com/GabryeleSantoro"
 	},
-	"skills": [
-		{
-			"name": "deliberate",
-			"path": "./skills/deliberate"
-		}
-	]
+	"skills": ["./skills/deliberate"]
 }
