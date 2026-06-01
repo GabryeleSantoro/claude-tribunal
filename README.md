@@ -132,8 +132,7 @@ See also: [Discover and install plugins](https://code.claude.com/docs/en/discove
 # From the repo root — loads the plugin into Claude Code
 claude --plugin-dir .
 
-# After editing the plugin
-/reload-plugins
+# After editing the plugin — restart Claude Code to pick up changes
 ```
 
 > **Shortcut alias** — copy [`examples/tribunal-command.md`](examples/tribunal-command.md) to `.claude/commands/tribunal.md` in any project. Then `/tribunal` works as a bare alias for `/tribunal:deliberate` without typing the namespace.
@@ -168,7 +167,7 @@ For step-by-step smoke tests: [LOCAL_TESTING.md](LOCAL_TESTING.md) · For implem
 | `--multi-agent`            | —                       | Spawn each persona as a real subagent. Same weighted verdict, higher fidelity, more latency.                              |
 | `--persona "…"`            | string                  | Replace the Domain Expert slot with a named custom expert.                                                                |
 | `--domain …`               | string                  | Domain hint — e.g. `ethical`, `technical`, `legal`. Shapes role labels.                                                   |
-| `--export`                 | `md` \| `json` \| `adr` | Append an extra export block to the output file. Markdown verdict is always written.                                      |
+| `--export`                 | `json` \| `adr`         | Append a structured export block to the output file. Markdown verdict is always written regardless.                       |
 | `--min-confidence N`       | `0`–`100`               | Gate weak consensus: if weighted strength `< N`, the Decision opens by stating the threshold wasn't met and preserves the split.   |
 
 <br>
@@ -311,7 +310,7 @@ v̄ = Σ(vᵢ · cᵢ) / Σcᵢ      where cᵢ = confidence ∈ [0, 100]
 
 Tribunal ships its own measurement harness under [`benchmarks/`](benchmarks/) — token usage, wall time, a heuristic protocol-fidelity rubric, and an optional LLM judge. Results below are from local runs; reproduce them yourself with the commands underneath.
 
-**Protocol fidelity** — single-model, compact verdict, `claude-sonnet-4` (5 cases):
+**Protocol fidelity** — single-model, compact verdict, `claude-sonnet-4-20250514` (5 cases):
 
 | Metric                         | Value             |
 | ------------------------------ | ----------------- |
@@ -330,7 +329,7 @@ Tribunal ships its own measurement harness under [`benchmarks/`](benchmarks/) �
 
 The token premium buys what the baseline doesn't quantify: explicit per-persona positions, a weighted consensus number, surfaced dissent, and confidence gating. On the telemetry-SDK eval, the panel rejected at 23% against a 70% gate where the baseline shipped at 72% — the structured split caught tensions the single pass absorbed silently.
 
-> **Honest caveats.** The rubric scores **protocol fidelity, not decision correctness** — for correctness, run the ground-truth set (`skills/deliberate/evals/ground-truth.json`) with a judge model (see [LOCAL_TESTING.md](LOCAL_TESTING.md) §8). `--multi-agent` raises latency substantially (real subagent dispatch). Numbers are `claude-sonnet-4`; your model and topics will vary.
+> **Honest caveats.** The rubric scores **protocol fidelity, not decision correctness** — for correctness, run the ground-truth set (`skills/deliberate/evals/ground-truth.json`) with a judge model (see [LOCAL_TESTING.md](LOCAL_TESTING.md) §8). `--multi-agent` raises latency substantially (real subagent dispatch). Numbers are `claude-sonnet-4-20250514`; your model and topics will vary.
 
 **Reproduce:**
 
