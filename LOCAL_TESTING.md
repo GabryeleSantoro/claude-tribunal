@@ -123,3 +123,16 @@ python run_benchmarks.py --model anthropic/claude-sonnet-4
 Shared env knobs: **TRIBUNAL_BENCHMARK_MODEL** (or **OPENROUTER_BENCHMARK_MODEL** for a slug used only under OpenRouter), **TRIBUNAL_BENCHMARK_MAX_TOKENS**, **TRIBUNAL_BENCHMARK_JUDGE_MODEL** (grading model id must match your backend—Anthropic id vs OpenRouter slug).
 
 Use **`--judge-model`** (or **`TRIBUNAL_BENCHMARK_JUDGE_MODEL`**) for a second call that scores structure / verdict math / topic fit (extra tokens and latency).
+
+## 8. Optional: ground-truth correctness check
+
+`cases.json` and the protocol judge measure **structure**, not whether the verdict is **right**. The ground-truth set (`skills/deliberate/evals/ground-truth.json`) carries cases with a defensible correct answer — each guards one quality lever (false-balance resistance, confidence calibration, decision-follows-math, grounding, the `--min-confidence` gate). Use it as a regression guard before tagging a release, not as a statistical benchmark.
+
+```bash
+export ANTHROPIC_API_KEY=...
+python run_benchmarks.py \
+  --ground-truth ../skills/deliberate/evals/ground-truth.json \
+  --judge-model claude-sonnet-4-20250514
+```
+
+The correctness judge (needs `--judge-model`) grades **direction match**, **confidence band**, **surfaced facts**, and **failure triggers** per case, and the summary adds `mean_correctness`, `direction_match_rate`, and `failures_triggered`. Any `failures_triggered > 0` or a dropped `direction_match_rate` is a quality regression to investigate. Without a judge model the cases still run, but only structure is scored.

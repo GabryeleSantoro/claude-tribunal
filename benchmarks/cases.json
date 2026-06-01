@@ -1,0 +1,27 @@
+[
+  {
+    "id": "brief-compact-technical",
+    "description": "Brief depth, compact verdict body (default file style)",
+    "arguments": "--brief Choose Redis or Memcached for session store on a 3-node cluster with sticky sessions?"
+  },
+  {
+    "id": "full-compact-ethical",
+    "description": "Full depth, compact verdict (richer internal deliberation, still compact sections)",
+    "arguments": "--depth full Should we ship a feature that improves engagement but adds one extra permission prompt?"
+  },
+  {
+    "id": "brief-full-log-strategy",
+    "description": "Brief + full skeleton (panel, cross-exam, deliberation visible)",
+    "arguments": "--brief --full-log --export json Monolith first vs microservices first for a 5-engineer SaaS?"
+  },
+  {
+    "id": "domain-min-confidence",
+    "description": "Domain hint + confidence gate wording",
+    "arguments": "--brief --domain technical --min-confidence 75 SQLite vs Postgres for an offline-first desktop notes app?"
+  },
+  {
+    "id": "long-topic-stress",
+    "description": "Longer topic string (prompt size sensitivity)",
+    "arguments": "--brief Evaluate three options for CI: GitHub Actions self-hosted runners on spare laptops, ephemeral cloud VMs with spot pricing, or a managed macOS fleet. Constraints: reproducible builds, artifact signing, SOC2-lite evidence, <$800/mo blended. Pick one primary and one backup."
+  }
+]

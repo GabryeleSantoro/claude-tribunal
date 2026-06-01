@@ -15,6 +15,8 @@ The user message is structured. The first line must be **`Mode: opening`**, **`M
 
 Input fields: `Topic`, `Domain`, `RoleLabel`, `CustomExpertContext` (use this title/expertise when set; otherwise generic SME).
 
+**Grounding:** if the Topic turns on checkable facts (repo contents, file structure, a library's real behavior, a live spec), **read** the relevant files / web before opening rather than arguing from priors; cite what you checked. Skip this for taste, strategy, or hypothetical topics where there is no ground truth.
+
 Output: **only** your initial position — one focused argument (2–5 short paragraphs max). Do **not** name or address other panel roles. No verdict, no vote.
 
 ### Mode: challenge

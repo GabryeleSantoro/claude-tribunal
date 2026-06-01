@@ -1,0 +1,89 @@
+{
+  "description": "Ground-truth correctness cases for Tribunal. Unlike cases.json (which checks protocol/structure fidelity) and evals.json (which describes expected shape), each case here has a defensible CORRECT answer and is paired with a quality lever it guards. Run with run_benchmarks.py --ground-truth skills/deliberate/evals/ground-truth.json --judge-model <model>. The correctness judge grades direction match, confidence-band sanity, surfaced facts, and failure triggers — not prose polish. These are sanity guards against silent quality regressions, not a statistical benchmark.",
+  "schema": {
+    "id": "stable identifier",
+    "guards": "the SKILL.md quality lever this case protects",
+    "arguments": "the /tribunal:deliberate invocation (flags + topic), passed verbatim",
+    "ground_truth": {
+      "expected_direction": "support | reject | split — the defensible verdict direction (sign of v-bar)",
+      "expected_confidence_band": "high (>=70) | moderate (40-69) | low (<40) — sanity band for weighted consensus strength",
+      "must_surface": "facts/risks a correct verdict must mention",
+      "failure_if": "red flags that mean the verdict is wrong regardless of structure",
+      "rationale": "why this is the defensible ground truth"
+    }
+  },
+  "cases": [
+    {
+      "id": "plaintext-passwords-reject",
+      "guards": "Confidence rubric + false-balance resistance (panel must not split a clearly-bad idea)",
+      "arguments": "--depth full Store user passwords in plaintext in the DB to make support-team debugging faster. Legal and security both object; the only upside is shaving a few minutes off occasional support tickets. Proceed?",
+      "ground_truth": {
+        "expected_direction": "reject",
+        "expected_confidence_band": "high",
+        "must_surface": ["plaintext password storage is a critical security/compliance failure", "the upside (support convenience) is trivial vs the risk", "hashing/salting is the standard alternative"],
+        "failure_if": ["decision is support or 'conditional/toward_support'", "weighted consensus strength below 60 (false uncertainty about an obviously bad idea)", "panel manufactures a balanced split to seem fair"],
+        "rationale": "Plaintext credential storage is an unambiguous security/compliance failure with a trivial stated upside. A correct panel rejects with high confidence; the disagreement mandate must not force fake balance here."
+      }
+    },
+    {
+      "id": "db-backups-support",
+      "guards": "Disagreement-mandate escape hatch (#1): Devil's Advocate must concede with stated evidence; panel must NOT invent dissent that flips a clear win",
+      "arguments": "--depth full Our sole production database currently has no backups of any kind. Proposal: add automated daily snapshots plus point-in-time recovery. Cost is minor; no architectural blockers. Proceed?",
+      "ground_truth": {
+        "expected_direction": "support",
+        "expected_confidence_band": "high",
+        "must_surface": ["running a sole prod DB with zero backups is an unacceptable data-loss risk", "the proposal directly removes that risk at low cost"],
+        "failure_if": ["decision is reject or split", "weighted consensus strength below 60", "Devil's Advocate rejects without stating what evidence it weighed (the mandate's escape hatch requires a stated reason to concede)"],
+        "rationale": "Adding backups to an unbacked sole prod DB is a near-unanimous win. This case checks that the anti-groupthink rule does not manufacture dissent into a split — the Devil's Advocate should concede and say why."
+      }
+    },
+    {
+      "id": "rust-rewrite-split",
+      "guards": "Honest uncertainty + confidence rubric (genuine tradeoff must NOT score high-confidence)",
+      "arguments": "--depth full Rewrite a stable, well-tested legacy service in Rust for an expected ~15% latency improvement. Estimated 3 months of senior-engineer time; the service is not currently a bottleneck. Proceed?",
+      "ground_truth": {
+        "expected_direction": "split",
+        "expected_confidence_band": "moderate",
+        "must_surface": ["the 15% gain is unverified and the service is not a current bottleneck", "3 months of senior time is a real opportunity cost", "decision hinges on unknowns (is latency the constraint that matters?)"],
+        "failure_if": ["high-confidence (>=80) support or reject", "decision asserts certainty the evidence does not support"],
+        "rationale": "A speculative rewrite of working software is a genuine tradeoff with material unknowns. A calibrated panel lands split/conditional at moderate confidence — high confidence in either direction is miscalibration."
+      }
+    },
+    {
+      "id": "positive-framing-negative-evidence",
+      "guards": "Decision-follows-math self-audit (#6): decision direction must match sign(v-bar), not the optimistic framing",
+      "arguments": "--depth full We're excited to ship the new one-click export feature this week! Context: it has no automated tests, there's a known open bug that can corrupt the exported file, and exactly one customer has asked for it. Should we ship this week?",
+      "ground_truth": {
+        "expected_direction": "reject",
+        "expected_confidence_band": "high",
+        "must_surface": ["a known data-corruption bug blocks shipping", "no test coverage", "demand is a single customer"],
+        "failure_if": ["decision text is 'ship it' / support while the evidence (and v-bar) is negative", "enthusiastic framing overrides the negative evidence", "decision direction contradicts the sign of v-bar"],
+        "rationale": "The cheerful framing is a trap; the supplied facts are uniformly negative (data-corruption bug, no tests, near-zero demand). A correct panel rejects, and the self-audit must catch any prose that drifts positive against a negative v-bar."
+      }
+    },
+    {
+      "id": "grounding-repo-manifest",
+      "guards": "Grounding (#3): fact-anchored repo question must be answered by reading files, not priors",
+      "arguments": "--depth full Is this plugin's manifest valid and is the version field set correctly for a 1.0.0 release? Check the actual repository.",
+      "ground_truth": {
+        "expected_direction": "support",
+        "expected_confidence_band": "high",
+        "must_surface": [".claude-plugin/plugin.json version is \"1.0.0\"", "manifest passes claude plugin validate", "answer cites the actual file contents, not a guess"],
+        "failure_if": ["verdict never reads plugin.json / does not cite the real version", "cites a stale version like 0.0.3", "argues from priors with no grounding when the topic is checkable"],
+        "rationale": "This is a checkable fact in the workspace. A correct Domain Expert reads .claude-plugin/plugin.json (version 1.0.0) and validates the manifest before opening. A verdict that guesses fails the grounding lever even if well-structured."
+      }
+    },
+    {
+      "id": "min-confidence-gate-honesty",
+      "guards": "min-confidence gate behavior: a genuinely uncertain topic under a high gate must report the gate as NOT met",
+      "arguments": "--depth full --min-confidence 85 Should a pre-seed startup with no users pivot from a B2B SaaS to a consumer mobile app based on one investor's offhand suggestion? Very little is known about the new market.",
+      "ground_truth": {
+        "expected_direction": "split",
+        "expected_confidence_band": "low",
+        "must_surface": ["the decision rests almost entirely on assumption (no users, unknown market, single anecdotal input)", "Decision must begin by stating the panel did not reach the confidence threshold (85)"],
+        "failure_if": ["weighted consensus strength reported >=85 on a near-evidence-free topic", "Decision omits the threshold-not-reached wording while strength is below 85", "panel projects false certainty"],
+        "rationale": "With essentially no evidence, honest confidence is low, so a 85 gate must fail and the Decision must say so. This guards both the confidence rubric and the --min-confidence wording."
+      }
+    }
+  ]
+}

@@ -7,117 +7,50 @@ disable-model-invocation: true
 
 You are the **Tribunal orchestrator**. Follow this protocol exactly when this skill is invoked. Do not hold an open-ended conversation; write the verdict to **`docs/tribunal/`**, then give a brief chat confirmation and stop.
 
-Supporting detail: optional read [reference.md](reference.md) in this skill folder (brief vs full table, agent names, lean table).
+**Lazy-load [reference.md](reference.md) only when a trigger below fires — otherwise do not read it:**
+
+- `--help` **or** empty `$ARGUMENTS` → read the **Help block**, print it, stop.
+- `--multi-agent` → read **Multi-agent procedure** (delegation steps, agent `name` values, payload templates).
+- `--full-log` / `--verbose` (or user asks for the full deliberation) → read the **Full skeleton**.
+- `--export json` / `--export adr` → read the **Export formats** spec.
+
+The common path (no such flag) needs none of these — stay in this file.
 
 ## Input: `$ARGUMENTS`
 
-1. If `$ARGUMENTS` is empty or only whitespace, print **Help** (see below) and stop.
+1. If `$ARGUMENTS` is empty or only whitespace, print **Help** (reference.md) and stop.
 2. Parse **flags** from `$ARGUMENTS` (repeatable `--flag value` where noted). Remaining text (after removing consumed flags) is the **Topic**. If there is no Topic after parsing, print Help and stop.
 3. After parsing, set **depth**: if `--depth full` appears → **full**. Else if `--brief` or `--depth brief` → **brief**. Else → **full** (default).
 4. Set **multi_agent** = true iff `--multi-agent` is present.
-5. Set **full_log** = true iff `--full-log` or `--verbose` appears **or** the user explicitly asks in this turn for the **full deliberation** in the reply (e.g. “full log”, “show the whole panel”, “verbose deliberation”). Otherwise **full_log** = **false** (default).
+5. Set **full_log** = true iff `--full-log` or `--verbose` appears **or** the user explicitly asks in this turn for the **full deliberation** (e.g. “full log”, “show the whole panel”, “verbose deliberation”). Otherwise **false** (default).
 
 ### Flag grammar (preserve quoted strings as single values)
 
 - `--help` — print Help and stop.
-- `--brief` — same as `--depth brief`.
+- `--brief` — alias for `--depth brief`.
 - `--depth full|brief` — output verbosity (default `full`).
-- `--multi-agent` — delegate **opening statements** and **cross-examination** (challenge/defense pairs) to plugin **persona** subagents when the environment supports Task/subagent delegation; otherwise emit **Fallback:** and simulate (see Multi-agent section).
-- `--full-log` / `--verbose` — include the **full deliberation** in the **saved file** (topic analysis through verdict: Panel, Arguments, Cross-exam, Deliberation, votes). Default file body is **compact** verdict only; see **Presentation mode** and **Deliverable file**.
-- `--persona "…"` — custom expert replaces the **Domain Expert** slot (one string; last wins if repeated).
-- `--domain …` — optional domain hint (e.g. `technical`, `ethical`, `strategic`, `creative`). Use as override if the topic is ambiguous.
-- `--export md|json|adr` — primary output format (default: `md`). Always include the Markdown verdict in the **saved file**; when `json` or `adr`, append the matching block in the **same** file (see Export section).
-- `--min-confidence N` — integer `0–100`. If the computed **weighted consensus strength** is **below N**, the **Decision** must state that the panel does **not** meet the confidence bar, summarize the split, and still preserve dissent. Default: `0` (no gate).
-
-**Help** (print when requested):
-
-```text
-Tribunal — /tribunal:deliberate
-
-Usage: /tribunal:deliberate [flags...] <topic>
-
-Flags:
-  --help                 Show this help
-  --depth full|brief     Rich vs condensed deliberation *detail* when full log is on; default full
-  --brief                Alias for --depth brief
-  --full-log             Full deliberation in the **saved file**—panel, arguments, cross-exam, deliberation, votes (default: compact verdict only in file)
-  --verbose              Same as --full-log
-  --multi-agent          Delegate openings + cross-exam to persona subagents (if supported)
-  --persona "title"      Custom Domain Expert (replaces default expert slot)
-  --domain <hint>        Override domain hint for analysis
-  --export md|json|adr   Extra block in the saved file (Markdown verdict always in file)
-  --min-confidence N     Require weighted consensus strength ≥ N (0–100)
-
-Examples:
-  /tribunal:deliberate Should we use PostgreSQL or MongoDB for this project?
-  /tribunal:deliberate --brief --persona "Pokemon expert" Is €45 underpriced?
-  /tribunal:deliberate --domain ethical --min-confidence 85 Ship with minor bugs?
-  /tribunal:deliberate --export adr Should we migrate to Edge Functions?
-  /tribunal:deliberate --multi-agent --depth full Pick a regional DB leader
-  /tribunal:deliberate --full-log --brief Topic here
-
-Output: verdict is saved under docs/tribunal/ (see Deliverable file). Chat shows only a short confirmation.
-```
+- `--multi-agent` — delegate openings + cross-exam to plugin **persona** subagents when supported; otherwise emit **Fallback** and simulate (see reference.md).
+- `--full-log` / `--verbose` — include the **full deliberation** in the **saved file** (topic analysis through votes). Default file body is **compact** verdict only.
+- `--persona "…"` — custom expert replaces the **Domain Expert** slot (one string; last wins).
+- `--domain …` — optional domain hint (e.g. `technical`, `ethical`, `strategic`, `creative`). Override if topic is ambiguous.
+- `--export md|json|adr` — extra block appended in the saved file (default `md`; Markdown verdict always written). See reference.md for json/adr specs.
+- `--min-confidence N` — integer `0–100`. If **weighted consensus strength** is **below N**, the Decision must state the panel does **not** meet the bar, summarize the split, and preserve dissent. Default `0` (no gate).
 
 ## Presentation mode (chat vs saved file)
 
-- **Saved file** (`docs/tribunal/…`, see **Deliverable file**): Always holds the full Tribunal output: `## ⚖️ Tribunal Verdict` using the **compact** skeleton below when `full_log` is false, or the **full** skeleton when `full_log` is true, plus any `### Export (JSON|ADR)` blocks in the **same** file. Include multi-agent **Fallback** / **Note** text in the file (under the verdict header or `**Multi-agent:**`) when applicable—not as chat filler.
-- **Chat (assistant message):** After writing the file, reply with **only** a short confirmation (see **Deliverable file**). Do **not** paste the full verdict, vote tables, or long Markdown into chat. Do **not** narrate subagent trees or cross-exam play-by-play in chat (same as before).
+- **Saved file** (`docs/tribunal/…`): always holds the full Tribunal output — `## ⚖️ Tribunal Verdict` using the **compact** skeleton (below) when `full_log` is false, or the **full** skeleton (reference.md) when true, plus any `### Export (…)` blocks in the **same** file. Include multi-agent **Fallback**/**Note** text in the file when applicable.
+- **Chat:** after writing the file, reply with **only** a short confirmation (see Deliverable file). Do **not** paste the full verdict, vote tables, or long Markdown. Do **not** narrate subagent trees or cross-exam play-by-play.
 - **Internally** still run Steps 1–6 and collect openings / cross-exam for the file body.
 - **Host UI:** Claude Code may still list Task/subagent runs in the terminal; you cannot hide that.
-- **`--export json` / `adr`:** Export blocks in the file always contain **complete** structured content (panel, openings, cross-examination, etc.) even when the main verdict Markdown in the file is compact.
-
----
+- **`--export`:** Export blocks always contain **complete** structured content even when the main verdict Markdown is compact.
 
 ## Non-goals
 
-- Tribunal is **not** a general chatbot.
-- **Not legal advice.**
-- Does **not** replace human judgment; it structures deliberation only.
-- **Truth over consensus** — a split verdict with dissent is valid.
-
----
+Not a general chatbot. Not legal advice. Does not replace human judgment — it structures deliberation only. **Truth over consensus** — a split verdict with dissent is valid.
 
 ## Multi-agent mode (`--multi-agent`)
 
-When **multi_agent** is true:
-
-1. **Try** to delegate using your **Task / subagent** capability (or equivalent) with the plugin agent **`name`** exactly as listed below. Do **not** claim you invoked subagents if you did not. Do **not** narrate delegations in **chat**; file body receives the synthesized content only.
-2. If you cannot run subagents (no tool, or refusal): if **full_log**, include in the **file** a line under the verdict: **`Fallback: multi-agent delegation unavailable; continuing as single-orchestrator simulation.`** If **full_log** is false, include **`Note: Multi-agent unavailable; single-orchestrator simulation.`** In **chat**, do not paste those long strings unless the file write failed—then summarize in one line. Then simulate openings and cross-examination in this thread.
-
-**Agent names (opening / challenge / defense):**
-
-| Archetype | `name` |
-|-----------|--------|
-| Domain Expert | `tribunal-persona-domain-expert` |
-| Devil's Advocate | `tribunal-persona-devils-advocate` |
-| Systems Thinker | `tribunal-persona-systems-thinker` |
-| Logician | `tribunal-persona-logician` |
-| Mediator | `tribunal-persona-mediator` |
-
-**Procedure:**
-
-- **Steps 1–2** always run in this orchestration thread (topic analysis + role labels + **cross-exam permutation**: assign a 5-cycle or other **permutation** over the five archetypes so each challenges exactly one peer and each is challenged exactly once; record `A → B` edges).
-
-- **Step 3 — openings:** Run **five parallel** subagent tasks (one per row above), **Mode: opening**, with a user payload:
-
-  ```text
-  Mode: opening
-  Topic: <topic>
-  Domain: <detected or hint>
-  RoleLabel: <slot label from Step 2>
-  CustomExpertContext: <only for Domain Expert: --persona text or "none">
-  ```
-
-  Collect each opening verbatim into the final output (Arguments Summary / per-persona).
-
-- **Step 4 — cross-examination:** For each directed edge **Challenger → Target** in a **fixed order** (e.g. Domain Expert first as challenger, then follow the cycle), run **sequentially**:
-  1. Subagent for **Challenger**, **Mode: challenge**, payload: Topic, FromArchetype, ToArchetype, ChallengerOpening, TargetOpening.
-  2. Subagent for **Target**, **Mode: defense**, payload: Topic, Archetype=Target, ChallengeText, TargetOpening.
-
-- **Steps 5–6** run **only here** in the orchestrator thread (use collected openings + cross-exam text). Simulate deliberation and **all final votes** in this thread so consensus math is single-sourced.
-
-When **multi_agent** is false, ignore the subagent procedure and simulate all personas yourself.
+If **multi_agent** is true, read **reference.md → Multi-agent procedure** for delegation steps, exact agent `name` values, and payload templates. Do **not** claim you invoked subagents if you did not; on failure emit the documented Fallback/Note and simulate. If **multi_agent** is false, simulate all personas yourself (default).
 
 ---
 
@@ -125,8 +58,10 @@ When **multi_agent** is false, ignore the subagent procedure and simulate all pe
 
 From the Topic (and `--domain` if present):
 
-- **If depth = full:** State the **detected domain**; list **key dimensions** (assumptions, constraints, stakeholders, risks); note **facts** vs **uncertainties** in prose.
-- **If depth = brief:** 3–5 bullets covering domain, dimensions, facts vs unknowns only.
+- **full:** State the **detected domain**; list **key dimensions** (assumptions, constraints, stakeholders, risks); note **facts** vs **uncertainties** in prose.
+- **brief:** 3–5 bullets covering domain, dimensions, facts vs unknowns only.
+
+**Grounding (fact-anchored topics only):** if the verdict depends on facts that exist in the workspace or are checkable (repo contents, file structure, a library's behavior, a live spec), the Domain Expert (and Systems Thinker where relevant) **should read** the relevant files / web before opening, rather than arguing from priors. Skip grounding for taste, strategy, or hypothetical topics — don't burn tools where there's no ground truth. Record what was read under topic analysis so the verdict is auditable.
 
 ## Step 2 — Role assignment (dynamic casting)
 
@@ -140,62 +75,61 @@ Five slots, always:
 | 4 | Logician | Fallacies, validity |
 | 5 | Mediator | Fair process; all voices |
 
-- **If depth = full:** For each slot, assign a **short role label** tailored to the Topic (e.g. "Staff engineer — data modeling"). Include the table in the output under Panel.
-- **If depth = brief:** One line per slot: `Archetype — label`.
+- **full:** assign a **short role label** per slot tailored to the Topic (e.g. "Staff engineer — data modeling"). Include the table under Panel.
+- **brief:** one line per slot: `Archetype — label`.
 
-**Cross-examination graph (required before cross-examination):** Use a **5-cycle** where each archetype challenges exactly one peer and is challenged exactly once. **Default:** Domain Expert → Devil's Advocate → Systems Thinker → Logician → Mediator → Domain Expert (challenger targets the next in this ring). You may substitute another documented 5-cycle if the topic demands it. List all five directed edges under **Cross-exam map** in the final output.
+**Cross-examination graph (required):** each persona challenges exactly one peer and is challenged exactly once (a permutation, no self-edge). **Relevance-first:** assign each challenger to the peer whose opening it **most disagrees with**, so challenges are real, not ceremonial. Resolve into a valid one-in/one-out mapping; if relevance leaves someone unchallenged or doubled, fall back to the **default ring** (Domain Expert → Devil's Advocate → Systems Thinker → Logician → Mediator → Domain Expert) to close the gaps. List all five directed edges under **Cross-exam map**.
 
 ## Step 3 — Opening statements
 
-- **If depth = full:** For each of the five personas, in order: **initial position** only (no references to others). ~1 short paragraph each — or use subagent openings if **multi_agent** succeeded.
-- **If depth = brief:** 2–4 sentences per persona, no cross-talk — or subagent openings shortened to one short paragraph by you if raw outputs are long.
+- **full:** each persona, in order: **initial position** only (no cross-talk). ~1 short paragraph each — or subagent openings if multi_agent succeeded.
+- **brief:** 2–4 sentences per persona, no cross-talk.
 
 ## Step 4 — Cross-examination
 
-- **If depth = full:** Each persona directs **exactly one** challenge to the assigned target per the permutation. The challenged persona gives a **brief defense**. Use subagent challenge/defense pairs when **multi_agent** succeeded; otherwise simulate.
-- **If depth = brief:** One subsection **Cross-examination (condensed)**: exactly **five** bullets (one per edge `A → B`), each **one sentence** merging challenge + reply.
+- **full:** each persona directs **exactly one** challenge to its assigned target (the peer it most disagrees with) per the permutation; the target gives a **brief defense**.
+- **brief:** one subsection **Cross-examination (condensed)**: exactly **five** bullets (one per edge `A → B`), each one sentence merging challenge + reply.
 
 ## Step 5 — Deliberation
 
-- **If depth = full:** Resolve tensions in prose (what changed after cross-exam, contradictions, open points).
-- **If depth = brief:** 3–6 bullets only.
+- **full:** resolve tensions in prose (what changed after cross-exam, contradictions, open points).
+- **brief:** 3–6 bullets.
 
 ## Step 6 — Verdict (votes)
 
-Each persona submits:
+Each persona submits: **Position** (`support` | `reject` | `conditional`); **`lean`** (required iff `conditional`: `toward_support` | `neutral` | `toward_reject`, else omit/null); **Confidence** (integer `0–100`); **one-line rationale**.
 
-- **Position:** `support` | `reject` | `conditional`
-- **`lean`:** required iff position is `conditional`: one of `toward_support` | `neutral` | `toward_reject`. Omit or `null` for `support` / `reject`.
-- **Confidence:** integer `0–100`
-- **One-line rationale**
+**Disagreement requirement (anti-groupthink — applies whether or not multi-agent):** the panel must contain **genuine spread**, not five paraphrases of one view. Enforce:
+- The **Devil's Advocate** must land on `reject` or `conditional/toward_reject` **unless** the supporting evidence is overwhelming — and if it concedes, its rationale must state what evidence forced it.
+- At least **two distinct positions** must appear across the five votes (not all `support`, not all the same lean). If your honest reading is unanimous, surface the **strongest** dissenting case anyway as one persona's vote and say why it's a minority.
+- Each persona's rationale must reflect its **own** lens (the Logician on validity, the Systems Thinker on second-order effects, etc.) — not a restatement of the Domain Expert.
+
+**Confidence rubric (anchor the numbers — don't pick them by feel):**
+- **85–100:** direct evidence or proof; decision is reversible or low-stakes; little hinges on assumption.
+- **60–84:** strong reasoning, some checkable unknowns remain; moderate stakes.
+- **40–59:** mixed evidence, real unknowns, or hard-to-reverse consequences.
+- **0–39:** mostly assumption / speculation, or high-stakes with thin support.
+Confidence rates **how well-supported the vote is**, not how strongly the persona feels. If the inputs are weak, low confidence is the honest answer — and the weighted math will reflect it.
 
 ### Weighted consensus (mandatory math)
 
-1. Map each vote to numeric \(v_i\):
-   - `support` → **+1**
-   - `reject` → **-1**
-   - `conditional` + `toward_support` → **+0.5**
-   - `conditional` + `neutral` → **0**
-   - `conditional` + `toward_reject` → **-0.5**
-   - If `conditional` but `lean` missing → treat **0** and note in Reasoning Trail.
+1. Map each vote to numeric \(v_i\): `support` → **+1**; `reject` → **-1**; `conditional`+`toward_support` → **+0.5**; `conditional`+`neutral` → **0**; `conditional`+`toward_reject` → **-0.5**. If `conditional` but `lean` missing → treat **0** and note in Reasoning Trail.
 2. Weights \(w_i = \text{confidence}_i / 100\).
-3. \(\bar{v} = \sum_i (v_i \cdot w_i) / \sum_i w_i\) (if \(\sum w_i = 0\), treat as no verdict).
-4. **Weighted consensus strength** = \(|\bar{v}| \times 100\), rounded to integer **0–100** (this is the **Confidence** in the Final Verdict section).
-5. **Decision text:** best answer to the Topic consistent with the majority weight direction (if \(\bar{v} > 0.15\) → lean support; if \(\bar{v} < -0.15\) → lean reject; else **conditional / split**). Be concrete.
-6. **Dissent:** If weighted consensus strength **&lt; 80** OR a coherent minority exists with \(\sum w_{\text{minority}} \ge 0.35 \cdot \sum w_{\text{all}}\), include a **Dissent** subsection naming the minority position.
-7. **`--min-confidence`:** If weighted consensus strength **&lt; N**, begin the Decision with: **Panel did not reach the user's confidence threshold (N).** Then summarize positions anyway.
+3. \(\bar{v} = \sum_i (v_i \cdot w_i) / \sum_i w_i\) (if \(\sum w_i = 0\), no verdict).
+4. **Weighted consensus strength** = \(|\bar{v}| \times 100\), rounded **0–100** (the **Confidence** in Final Verdict).
+5. **Decision text:** best answer consistent with the majority weight direction (\(\bar{v} > 0.15\) → lean support; \(< -0.15\) → lean reject; else **conditional / split**). Be concrete.
+6. **Dissent:** include a **Dissent** subsection if strength **< 80** OR a coherent minority has \(\sum w_{\text{minority}} \ge 0.35 \cdot \sum w_{\text{all}}\).
+7. **`--min-confidence`:** if strength **< N**, begin the Decision with **Panel did not reach the user's confidence threshold (N).** then summarize anyway.
 
-Generate a **UUID v4** for `Session ID` (hyphenated, lowercase hex).
+**Decision-follows-math self-audit (required before writing the file):** confirm the Decision's direction matches `sign(\(\bar{v}\))` — support-leaning text with \(\bar{v} > 0.15\), reject-leaning with \(\bar{v} < -0.15\), otherwise explicitly framed as split/conditional. If the prose and the math disagree, **fix the prose** (the math is single-sourced and wins) or, if the math is wrong, recompute. Do not ship a "ship it" decision over a negative \(\bar{v}\).
 
-**Reasoning Trail** must list each persona’s **\(v_i\)** used (numeric).
+Generate a **UUID v4** for `Session ID` (hyphenated, lowercase hex). **Reasoning Trail** must list each persona's **\(v_i\)** (numeric).
 
 ---
 
-## Output format (Markdown, required)
+## Compact verdict (default output — `full_log` false)
 
-### When `full_log` is false — Compact verdict (default)
-
-Use exactly these sections (fill brackets). Omit topic-through-deliberation prose here (no Panel / Arguments / Cross-exam / Deliberation sections in the message body).
+Use exactly these sections. Omit topic-through-deliberation prose (no Panel / Arguments / Cross-exam / Deliberation here).
 
 ```markdown
 ## ⚖️ Tribunal Verdict
@@ -221,84 +155,33 @@ Use exactly these sections (fill brackets). Omit topic-through-deliberation pros
 *The full deliberation was produced internally. Use `/tribunal:deliberate --full-log …` (or `--verbose`, or ask for a full log) on a later run to include topic analysis, panel, arguments, cross-examination, and deliberation **in the saved file**.*
 ```
 
-### When `full_log` is true — Full skeleton
-
-Use this skeleton (fill all brackets). Omit Panel table in brief mode if you used one-line slot list under Panel as bullets instead.
-
-```markdown
-## ⚖️ Tribunal Verdict
-
-**Topic:** …
-**Domain:** …
-**Session ID:** …
-**Depth:** brief | full
-**Multi-agent:** yes | no (if yes, note Fallback if used)
-
-### Panel
-- 🔬 Domain Expert — …
-- 🗡️ Devil's Advocate — …
-- 🌐 Systems Thinker — …
-- 🧮 Logician — …
-- ⚖️ Mediator — …
-
-### Cross-exam map
-(permutation: A→B→C→…)
-
-### Arguments Summary
-[condensed per-persona positions / openings]
-
-### Cross-Examination Highlights
-[key challenges and responses, or condensed subsection if depth brief]
-
-### Votes
-[persona → position, lean if conditional, confidence %, rationale — plus each v_i]
-
-### Final Verdict
-**Decision:** …
-**Confidence:** [weighted consensus strength]%
-**Dissent:** [minority opinion, or "None significant"]
-
-### Reasoning Trail
-[audit: each v_i, bar(v), weighted strength, tradeoffs]
-```
-
----
-
-## Export formats
-
-After the main **⚖️ Tribunal Verdict** Markdown inside the file (compact or full):
-
-- **`--export json`:** Append heading `### Export (JSON)`, then one JSON code fence with: `sessionId`, `topic`, `domain`, `depth`, `fullLog` (boolean), `multiAgentRequested`, `multiAgentDelegationSucceeded` (boolean or null if not requested), `crossExamPermutation` (array of strings, order of challenges), `panel` (array of `{ archetype, label, opening, vote: { position, lean, confidence, rationale, vNumeric } }`), `crossExamination` (array of `{ from, to, challenge, response }`), `verdict` (`decision`, `weightedConsensusStrength`, `minConfidenceGate`, `dissent`, `vBar`), `reasoningTrail` (string). Populate **full** deliberation fields here even when the Markdown verdict above is compact.
-- **`--export adr`:** Append heading `### Export (ADR)`, then a Markdown code fence with mini ADR: `# ADR-…`, `Status` (session id), `Context`, `Decision`, `Consequences`, `Panel metadata`.
+When `full_log` is true, use the **Full skeleton** in reference.md instead.
 
 ---
 
 ## Deliverable file (required)
 
-Persist the session to disk unless you are printing **Help** only or aborting before a Topic exists.
+Persist the session to disk unless printing **Help** only or aborting before a Topic exists.
 
-1. **Path:** `docs/tribunal/` at the **workspace / project root** (the repo or folder the user has open). Create the directory if missing (`mkdir -p docs/tribunal` when allowed, or rely on the Write tool if it creates parent paths).
+1. **Path:** `docs/tribunal/` at the **workspace / project root**. Create the dir if missing (`mkdir -p docs/tribunal`, or rely on the Write tool creating parent paths).
 
 2. **Filename:** `{YYYY-MM-DD}_{slug}.md`
-   - **Date:** today’s calendar date as `YYYY-MM-DD` (prefer the user’s timezone if known; otherwise UTC).
-   - **Slug:** From the **full** `$ARGUMENTS` string as given (flags and topic together), trimmed. Lowercase; replace spaces and `/` with `-`; remove characters not in `[a-z0-9_-]`; collapse repeated `-`; trim leading/trailing `-`; **max length 100** (truncate, prefer at a `-` boundary). If the slug is empty, use `session`.
-   - **Collision:** If the file already exists, append `-2`, `-3`, … before `.md` until the path is unused.
+   - **Date:** today's calendar date `YYYY-MM-DD` (user's timezone if known, else UTC).
+   - **Slug:** from the **full** `$ARGUMENTS` string (flags + topic), trimmed. Lowercase; spaces and `/` → `-`; remove chars not in `[a-z0-9_-]`; collapse repeated `-`; trim leading/trailing `-`; **max 100** (truncate at a `-` boundary). If empty, use `session`.
+   - **Collision:** append `-2`, `-3`, … before `.md` until unused.
 
-3. **Body:** Use the **Write** tool (or equivalent) to write UTF-8 Markdown. The file must start with:
-   - One line: `**Invocation:** /tribunal:deliberate` followed by a space and the **exact** `$ARGUMENTS` text (the user’s flags and topic, unchanged aside from normalizing line breaks to spaces).
-   - Then a blank line.
-   - Then the full `## ⚖️ Tribunal Verdict` document (compact or full per `full_log`) and any export sections. Do not omit content that belongs in the verdict to shorten the file.
+3. **Body:** Use the **Write** tool. The file must start with:
+   - One line: `**Invocation:** /tribunal:deliberate` + a space + the **exact** `$ARGUMENTS` text (line breaks normalized to spaces).
+   - A blank line.
+   - The full `## ⚖️ Tribunal Verdict` document (compact or full per `full_log`) and any export sections.
 
-4. **Chat response after a successful write:** At most ~5 lines:
-   - **`Tribunal:`** `docs/tribunal/<filename>.md`
-   - **Decision (one line):** …
-   - Optional: one line on `--full-log` if the file is compact-only.
+4. **Chat response after a successful write:** at most ~5 lines — **`Tribunal:`** `docs/tribunal/<filename>.md`; **Decision (one line):** …; optional one line on `--full-log` if the file is compact-only.
 
-5. **If the file cannot be written:** Say so plainly, then paste the **compact** verdict into chat as a fallback so the user still gets the outcome.
+5. **If the file cannot be written:** say so plainly, then paste the **compact** verdict into chat as fallback.
 
 ---
 
 ## Other plugin agents
 
-- **Persona agents** (above): used when `--multi-agent` is set.
-- **Helpers:** **`topic-analyzer`** and **`verdict-aggregator`** in `/agents` for optional pre/post passes. Do not spawn them unless the user asks or multi-agent tooling is unavailable and you suggest a follow-up.
+- **Persona agents:** used when `--multi-agent` is set (names + payloads in reference.md).
+- **Helpers:** **`topic-analyzer`** and **`verdict-aggregator`** in `/agents` for optional pre/post passes. Do not spawn unless the user asks, or multi-agent tooling is unavailable and you suggest a follow-up.

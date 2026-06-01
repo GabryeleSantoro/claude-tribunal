@@ -1,4 +1,9 @@
-benchmarks/
+# Benchmark harness is public; only local run artifacts, secrets, and caches are ignored.
+benchmarks/.local/
+benchmarks/__pycache__/
+benchmarks/.venv/
+benchmarks/.env
+.env
 dist/
 deliberate-workspace/
 docs/

@@ -17,7 +17,7 @@
 
 [![Version](https://img.shields.io/github/v/release/GabryeleSantoro/claude-tribunal?style=for-the-badge&label=&logo=git&logoColor=white)](https://github.com/GabryeleSantoro/claude-tribunal/releases)&nbsp;
 [![Claude Plugin](https://img.shields.io/badge/Claude_Plugin-CC785C?style=for-the-badge&logo=anthropic&logoColor=white)](https://docs.anthropic.com)&nbsp;
-[![Verdicts](https://img.shields.io/badge/Verdicts→_docs%2Ftribunal%2F-444?style=for-the-badge)](./docs/tribunal/)
+[![Verdicts](https://img.shields.io/badge/Verdicts→_docs%2Ftribunal%2F-444?style=for-the-badge)](#-output-files)
 
 <br>
 
@@ -79,6 +79,24 @@ Each role has a fixed adversarial function:
 | **Mediator**         | Synthesizes tensions into a verdict the panel can live with.          |
 
 Votes are **conditional** — each persona can lean toward support or reject without full commitment. The weighted average decides.
+
+<br>
+
+---
+
+## ▸ Quality Controls
+
+A single model wearing five hats tends to agree with itself. Tribunal pushes back against that with explicit guardrails:
+
+| Control                     | What it enforces                                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Anti-groupthink mandate** | The Devil's Advocate must dissent unless evidence is overwhelming; ≥2 distinct positions must appear.         |
+| **Confidence rubric**       | Confidence numbers are anchored to evidence quality and reversibility — not picked by feel.                   |
+| **Grounding**               | On fact-anchored topics the Domain Expert reads the repo / web before arguing, instead of guessing from priors. |
+| **Relevance cross-exam**    | Each persona challenges the peer it *most disagrees with*; the ring is only a fallback to guarantee coverage. |
+| **Decision-follows-math**   | A self-audit confirms the written Decision matches the sign of `v̄` before the file is saved.                |
+
+These are guardrails, not guarantees — see [Benchmarks](#-benchmarks) for how they're measured.
 
 <br>
 
@@ -159,7 +177,7 @@ For step-by-step smoke tests: [LOCAL_TESTING.md](LOCAL_TESTING.md) · For implem
 | `--persona "…"`            | string                  | Replace the Domain Expert slot with a named custom expert.                                                                |
 | `--domain …`               | string                  | Domain hint — e.g. `ethical`, `technical`, `legal`. Shapes role labels.                                                   |
 | `--export`                 | `md` \| `json` \| `adr` | Append an extra export block to the output file. Markdown verdict is always written.                                      |
-| `--min-confidence N`       | `0`–`100`               | Flag weak consensus: warn when weighted confidence falls below N.                                                         |
+| `--min-confidence N`       | `0`–`100`               | Gate weak consensus: if weighted strength `< N`, the Decision opens by stating the threshold wasn't met and preserves the split.   |
 
 <br>
 
@@ -297,6 +315,48 @@ v̄ = Σ(vᵢ · cᵢ) / Σcᵢ      where cᵢ = confidence ∈ [0, 100]
 
 ---
 
+## ▸ Benchmarks
+
+Tribunal ships its own measurement harness under [`benchmarks/`](benchmarks/) — token usage, wall time, a heuristic protocol-fidelity rubric, and an optional LLM judge. Results below are from local runs; reproduce them yourself with the commands underneath.
+
+**Protocol fidelity** — single-model, compact verdict, `claude-sonnet-4` (5 cases):
+
+| Metric                         | Value             |
+| ------------------------------ | ----------------- |
+| Protocol-fidelity rubric       | **97.2 / 100**    |
+| Errors                         | **0 / 5**         |
+| Input tokens / case            | ~5.3k             |
+| Output tokens / case           | ~1.3k             |
+| Wall time / case (single-model)| ~22 s             |
+
+**Decision evals** — skill vs. no-skill baseline, assertion-graded (3 decisions):
+
+| Configuration | Assertions passed | Token cost      |
+| ------------- | ----------------- | --------------- |
+| With skill    | **17 / 17**       | +77% vs baseline |
+| Baseline      | 9 / 9             | —               |
+
+The token premium buys what the baseline doesn't quantify: explicit per-persona positions, a weighted consensus number, surfaced dissent, and confidence gating. On the telemetry-SDK eval, the panel rejected at 23% against a 70% gate where the baseline shipped at 72% — the structured split caught tensions the single pass absorbed silently.
+
+> **Honest caveats.** The rubric scores **protocol fidelity, not decision correctness** — for correctness, run the ground-truth set (`skills/deliberate/evals/ground-truth.json`) with a judge model (see [LOCAL_TESTING.md](LOCAL_TESTING.md) §8). `--multi-agent` raises latency substantially (real subagent dispatch). Numbers are `claude-sonnet-4`; your model and topics will vary.
+
+**Reproduce:**
+
+```bash
+cd benchmarks
+pip install -r requirements.txt
+python run_benchmarks.py --dry-run                          # plan only, no API key
+export ANTHROPIC_API_KEY=...
+python run_benchmarks.py                                    # protocol-fidelity + tokens + latency
+python run_benchmarks.py \
+  --ground-truth ../skills/deliberate/evals/ground-truth.json \
+  --judge-model claude-sonnet-4-20250514                    # decision-correctness guard
+```
+
+<br>
+
+---
+
 ## ▸ Non-Goals
 
 - Not a general chat assistant
@@ -320,7 +380,7 @@ MIT — free to use, modify, and distribute. See [LICENSE](LICENSE).
 
 <br>
 
-[Releases](https://github.com/GabryeleSantoro/claude-tribunal/releases) &nbsp;·&nbsp; [Local Testing](LOCAL_TESTING.md) &nbsp;·&nbsp; [reference](skills/deliberate/reference.md) &nbsp;·&nbsp; [License](LICENSE)
+[Releases](https://github.com/GabryeleSantoro/claude-tribunal/releases) &nbsp;·&nbsp; [Benchmarks](benchmarks/) &nbsp;·&nbsp; [Local Testing](LOCAL_TESTING.md) &nbsp;·&nbsp; [reference](skills/deliberate/reference.md) &nbsp;·&nbsp; [License](LICENSE)
 
 <br>
 
