@@ -26,11 +26,7 @@ Use the same project folder you want to deliberate _about_ if you care about rep
 
 ## 2. Reload after edits
 
-Whenever you change `SKILL.md`, agents, or `plugin.json`:
-
-```text
-/reload-plugins
-```
+Whenever you change `SKILL.md`, agents, or `plugin.json`, restart Claude Code with the same `--plugin-dir` flag to pick up changes.
 
 ## 3. Smoke tests (in Claude Code)
 
@@ -82,9 +78,9 @@ Fix any reported issues in `.claude-plugin/plugin.json`, skill frontmatter, or a
 
 | Symptom                         | What to try                                                                                         |
 | ------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Unknown command / skill missing | Confirm you started with `--plugin-dir` pointing at this repo, then `/reload-plugins`.              |
-| Old behavior after edits        | Run `/reload-plugins` again; confirm you saved files in the same tree you passed to `--plugin-dir`. |
-| Plugin errors in UI             | Open `/plugin` → **Errors** tab for load details.                                                   |
+| Unknown command / skill missing | Confirm you started with `--plugin-dir` pointing at this repo, then restart Claude Code.           |
+| Old behavior after edits        | Restart Claude Code with the same `--plugin-dir`; confirm you saved files in that tree.            |
+| Validate the manifest           | Run `claude plugin validate .` from the repo root.                                                 |
 
 ## 6. Optional: project shortcut `/tribunal`
 

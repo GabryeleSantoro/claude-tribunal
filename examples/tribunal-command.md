@@ -17,7 +17,7 @@ Then use **`/tribunal`** from Claude Code the same way you would **`/tribunal:de
 
 ## Instructions for the assistant
 
-1. **Plugin:** The user must have the **tribunal** plugin enabled (e.g. `claude --plugin-dir /path/to/claude-tribunal` or marketplace install + `/reload-plugins`). If Tribunal is not available, say so and suggest loading the plugin.
+1. **Plugin:** The user must have the **tribunal** plugin enabled (e.g. `claude --plugin-dir /path/to/claude-tribunal` for local dev, or `claude plugin install tribunal@claude-tribunal` from the marketplace). If Tribunal is not available, say so and suggest loading the plugin.
 
 2. **Run:** Execute the **`tribunal:deliberate`** skill end-to-end. Pass through the user’s text **verbatim** as if they had run:
 

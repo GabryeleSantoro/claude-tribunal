@@ -104,29 +104,21 @@ These are guardrails, not guarantees — see [Benchmarks](#-benchmarks) for how 
 
 ## ▸ Install
 
-### From marketplace (inside Claude Code)
+### From marketplace
 
 1. **Add the marketplace** — registers the catalog (nothing installed yet):
 
-   ```
-   /plugin marketplace add GabryeleSantoro/claude-tribunal
-   ```
-
-   Or open `/plugin` → **Marketplaces** → add GitHub `GabryeleSantoro/claude-tribunal`.
-
-2. **Install the plugin** — pulls `tribunal` from that catalog (defaults to user scope; use `/plugin` UI to pick project or local scope):
-
-   ```
-   /plugin install tribunal@claude-tribunal
+   ```bash
+   claude plugin marketplace add GabryeleSantoro/claude-tribunal
    ```
 
-3. **Reload** — pick up skills and commands:
+2. **Install the plugin** — pulls `tribunal` from that catalog:
 
-   ```
-   /reload-plugins
+   ```bash
+   claude plugin install tribunal@claude-tribunal
    ```
 
-4. **Invoke** — skill is namespaced by plugin id:
+3. **Invoke** — restart Claude Code, then:
 
    ```
    /tribunal:deliberate [flags...] <topic>
