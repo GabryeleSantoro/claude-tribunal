@@ -16,8 +16,26 @@
 <br>
 
 [![Version](https://img.shields.io/github/v/release/GabryeleSantoro/claude-tribunal?style=for-the-badge&label=&logo=git&logoColor=white)](https://github.com/GabryeleSantoro/claude-tribunal/releases)&nbsp;
+[![License](https://img.shields.io/badge/License-MIT-444?style=for-the-badge)](LICENSE)&nbsp;
+[![Panel](https://img.shields.io/badge/Panel→_5_personas-444?style=for-the-badge)](#-why-five)&nbsp;
 [![Claude Plugin](https://img.shields.io/badge/Claude_Plugin-CC785C?style=for-the-badge&logo=anthropic&logoColor=white)](https://docs.anthropic.com)&nbsp;
-[![Verdicts](https://img.shields.io/badge/Verdicts→_docs%2Ftribunal%2F-444?style=for-the-badge)](#-output-files)
+[![Marketplace](https://img.shields.io/badge/Marketplace→_claude--tribunal-CC785C?style=for-the-badge&logo=anthropic&logoColor=white)](#-install)
+
+<br>
+
+[![Stars](https://img.shields.io/github/stars/GabryeleSantoro/claude-tribunal?style=for-the-badge&logo=github&logoColor=white&color=444)](https://github.com/GabryeleSantoro/claude-tribunal/stargazers)&nbsp;
+[![Last Commit](https://img.shields.io/github/last-commit/GabryeleSantoro/claude-tribunal/main?style=for-the-badge&logo=github&logoColor=white&color=444)](https://github.com/GabryeleSantoro/claude-tribunal/commits/main)&nbsp;
+[![Issues](https://img.shields.io/github/issues/GabryeleSantoro/claude-tribunal?style=for-the-badge&logo=github&logoColor=white&color=444)](https://github.com/GabryeleSantoro/claude-tribunal/issues)&nbsp;
+[![Author](https://img.shields.io/badge/Author→_Gabryele_Santoro-444?style=for-the-badge)](https://github.com/GabryeleSantoro)
+
+<br>
+
+[![Install](https://img.shields.io/badge/Install→_marketplace-444?style=for-the-badge)](#-install)&nbsp;
+[![Invoke](https://img.shields.io/badge/Invoke→_%2Ftribunal%3Adeliberate-444?style=for-the-badge)](#-invoke)&nbsp;
+[![Verdicts](https://img.shields.io/badge/Verdicts→_docs%2Ftribunal%2F-444?style=for-the-badge)](#-output-files)&nbsp;
+[![Benchmarks](https://img.shields.io/badge/Benchmarks→_97%2F100-444?style=for-the-badge)](benchmarks/)&nbsp;
+[![Local Testing](https://img.shields.io/badge/Local_Testing-444?style=for-the-badge)](LOCAL_TESTING.md)&nbsp;
+[![Reference](https://img.shields.io/badge/Reference→_protocol-444?style=for-the-badge)](skills/deliberate/reference.md)
 
 <br>
 
