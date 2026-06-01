@@ -1,0 +1,4 @@
+# Default owners — review required on pull requests when branch protection is enabled.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @GabryeleSantoro
